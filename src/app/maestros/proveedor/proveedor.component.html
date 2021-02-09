@@ -1,0 +1,175 @@
+<div class="p-2">
+  <br />
+  <div class="btn-toolbar justify-content-between mb-2" role="toolbar">
+    <div class="input-group mb-1" role="toolbar">
+      <div class="input-group-text border-0 font-weight-bolder text-uppercase pl-0 mr-2" style="background-color: transparent;">{{ titulo }}</div>
+				<div class="input-group-prepend">
+					<div class="input-group-text">Nickname</div>
+				</div>
+        <input class="form-control mr-2 text-uppercase" type="text"
+          name="NicknameFiltro" id="NicknameFiltro" maxlength="6"
+          [(ngModel)]="nicknameFiltro"
+					(keyup)="filtrar()"/>
+    </div>
+    <div class="btn-toolbar" role="toolbar">
+      <button type="button" id="btnCancelar" 
+      [disabled]="idProveedor?false:true" (click)="cancelar()"
+      class="btn btn-secondary border mr-1" style="height: 35px;"
+				>Cancelar</button>      
+      <button type="button" id="btnNuevo" 
+      [disabled]="idProveedor?true:false" (click)="nuevo()"
+      class="btn btn-secondary border mr-1" style="height: 35px;"
+				>Nuevo</button>
+		</div>
+  </div>
+  <div style="height: 400px;">
+    <table class="table table-bordered table-hover table-sm">
+      <tbody>
+        <tr *ngFor="let proveedor of proveedores; let i = index" class="text-uppercase">
+          <td style="width:95;">
+            <div class="p-2 mt-0">
+              <div class="form-group row mb-0">
+                <div class="col-sm-2">
+                  <div class="form-group row mb-1">
+                    <div class="col-sm">
+                      <img src="assets/images/notUser.png" class="border bg-secondary" height="185" width="100%"/>
+                      <!-- <img id="fotoForm" class="border bg-secondary" height="185" width="100%"/> -->
+                    </div>
+                  </div>
+                  <div class="form-group row mb-0">
+                    <div class="col-sm-2">
+                      <input id="fotoRuta" type="file" [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                      accept="image/*" name="file" style="display: none;"/>
+                    </div>
+                    <div class="col-sm">
+                      <button type="button" class="btn btn-secondary mb-1" [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                      onclick="document.getElementById('fotoRuta').click();">
+        								<img src="assets/images/search.png">
+        							</button>
+                      <span>&nbsp;</span>
+        							<button type="button" class="btn btn-secondary mb-1" [disabled]="idProveedor?proveedor.id!=idProveedor:true">
+        								<img src="assets/images/delete.png">
+        							</button>
+        						</div>
+                  </div>
+                </div>
+
+                <div class="col-sm-10">
+                  <div class="form-group row mb-0">
+                    <div class="col-sm">
+                      <div class="form-group row mb-0">
+                        <label class="col-sm-1 col-form-label">Tipo:</label>
+                        <div class="col-sm-2">
+                          <input (keyup)="cambiarValorTipoProveedor($event)" type="text"
+                            aria-label="tipoProveedor"
+                            matInput
+                            [matAutocomplete]="tipp"
+                            class="text-uppercase text-dark form-control" style="height: 28px;"
+                            [(ngModel)]="proveedor.tipoProveedor"
+                            id="proveedor_{{proveedor.nro}}"
+                            autocomplete="off" [disabled]="idProveedor?proveedor.id!=idProveedor:true">
+                          <mat-autocomplete #tipp="matAutocomplete" [displayWith]="mostrarNombreTipoProveedor">
+                            <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let tipoProveedor of tiposProveedor | async" [value]="tiposProveedor">
+                              {{tipoProveedor.nombre}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </div>
+                        <label class="col-sm-1 col-form-label">Fecha&nbsp;Reg.:</label>
+                        <div class="col-sm-2">
+            							<input type="date" class="form-control"
+                            [(ngModel)]="proveedor.fechaRegistro" style="height: 28px;"
+                            [disabled]="idProveedor?proveedor.id!=idProveedor:true">
+            						</div>                        
+                        <label class="col-sm-1 col-form-label">RUC:</label>
+                        <div class="col-sm-2">
+                          <input type="text" [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                          class="form-control text-uppercase" style="height: 28px;">
+                        </div>
+                        <label class="col-sm-1 col-form-label">Razon&nbsp;Social:</label>
+                        <div class="col-sm-2">
+                          <input type="text" [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                          class="form-control text-uppercase" style="height: 28px;"> 
+                        </div>                                           
+                      </div>
+
+                      <div class="form-group row mb-0">
+                        <label class="col-sm-1 col-form-label">Nickname:</label>
+                        <div class="col-sm-2">
+                          <input type="text" class="form-control text-uppercase" placeholder="Nickname"
+                            [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                            [(ngModel)]="proveedor.nickname" style="height: 28px;">
+            						</div>
+                        <label class="col-sm-1 col-form-label">Contacto:</label>
+                        <div class="col-sm-2">
+                          <input type="text" class="form-control text-uppercase" placeholder="Ap. Paterno"
+                            [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                            [(ngModel)]="proveedor.apellidoPaterno" style="height: 28px;">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <div class="col-sm-2">
+                          <input type="text" class="form-control text-uppercase" placeholder="Ap. Materno"
+                            [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                            [(ngModel)]="proveedor.apellidoMaterno" style="height: 28px;">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <div class="col-sm-2 ">
+                          <input type="text" class="form-control text-uppercase" placeholder="Nombres"
+                            [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                            [(ngModel)]="proveedor.nombres" style="height: 28px;">
+                        </div>
+                        <label class="col-sm-1 col-form-label">DNI:</label>
+                        <div class="col-sm-2">
+                          <input type="text" class="form-control text-uppercase" placeholder="DNI"
+                            [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                            [(ngModel)]="proveedor.dni" style="height: 28px;">
+            						</div>
+                        <label class="col-sm-1 col-form-label">Tfno1:</label>
+                        <div class="col-sm-2">
+                          <input type="text" class="form-control text-uppercase" placeholder="telefono"
+                            [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                            [(ngModel)]="proveedor.telefono1" style="height: 28px;">
+            						</div>
+                        <label class="col-sm-1 col-form-label">Tfno2:</label>
+                        <div class="col-sm-2">
+                          <input type="text" class="form-control text-uppercase" placeholder="telefono"
+                            [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                            [(ngModel)]="proveedor.telefono2" style="height: 28px;">
+            						</div>
+                      </div>
+                      <div class="form-group row mb-0" >
+                        <label class="col-sm-1 col-form-label">Observacion:</label>
+                        <div class="col-sm-11">
+                          <textarea placeholder="Observacion (MAX: 200 CARACTERES)" rows="3" maxlength="200"
+                            [disabled]="idProveedor?proveedor.id!=idProveedor:true"
+                            class="form-control text-uppercase" style="resize: none;"></textarea>
+                          <!--textarea name="" id="" cols="30" rows="10"
+                          [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueFruta"
+                          [(ngModel)]="det.observacion"-->
+            						</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row mb-0">
+                    <!-- Ultima fila con observacion y botones -->
+                    <div class="col-sm" style="position: absolute;bottom: 0;right: 0;">
+                      <button type="button" [disabled]="idProveedor?proveedor.id==idProveedor:true"
+                          class="btn btn-secondary border float-right p-0 d-none d-md-none d-lg-block"
+                          style="height: 28px; width: 60px;" (click)="guardar(proveedor)">Guardar</button>                      
+                        <button type="button" [disabled]="idProveedor?true:false" 
+                          class="btn btn-secondary border float-right p-0 d-none d-md-none d-lg-block"
+                          style="height: 28px; width: 60px;">Modificar</button>                                              
+                    </div>                                                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <div  [ngStyle]="{'pointer-events': !paginador?'none':'auto'}">
+      <paginator-nav *ngIf="paginador" [paginador] = "paginador" [enlacePaginador]="enlacePaginador"></paginator-nav>
+    </div>      
+  </div>
+</div>

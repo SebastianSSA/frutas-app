@@ -1,0 +1,22 @@
+.focusRed {
+  outline: 1px solid red;
+  border:1px solid red;
+  box-shadow: 0 0 5px red;
+  background-color:#fff0f0
+}
+
+.focusInput::-webkit-input-placeholder {
+  color: red
+}
+
+input[type="text"]:disabled {
+ color: black;
+}
+
+.mat-option{
+ background: black !important;
+}
+/* color de la seleccion */
+.mat-option.mat-active {
+ background: blue !important;
+}

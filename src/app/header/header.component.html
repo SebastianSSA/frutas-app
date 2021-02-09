@@ -1,0 +1,50 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a href="#"><img src="assets/images/logo-tevology.png" alt="Logo" style="width: 110px; height: 30px;"></a>
+  <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+  (click)="navbarCollapsed = !navbarCollapsed" [attr.aria-expanded]="!navbarCollapsed">
+  <!-- data-toggle="collapse" data-target="#navbarSupportedContent" -->
+  <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNav" [class.collapse]="navbarCollapsed">
+    <ul class="navbar-nav ml-auto">
+      <!-- <li class="nav-item dropdown show mx-1">
+        <a class="nav-link" href="#"
+						role="button" id="dropdownNotificacion" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="false" >NOTIFICAR</a>
+      </li> -->
+      <!-- <li class="nav-item dropdown show mx-1">
+        <a class="nav-link" href="#"
+						role="button" id="dropdownMaestros" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="false">MAESTROS</a>
+
+        <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuLink" routerLinkActive="active">
+          <a class="dropdown-item" routerLink="/login">Fruta</a>
+          <a class="dropdown-item" routerLink="/login">Almacen</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" routerLink="/proveedor">Proveedor</a>
+        </div>
+      </li> -->
+      <li class="nav-item dropdown" *ngIf="_authService.isAuthenticated()">
+        <a class="nav-link" href="#"
+						role="button" id="dropdownOperaciones" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="false">OPERACIONES</a>
+        <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownOperaciones">
+          <a class="dropdown-item" (click)="navegarPagina('/orden_compra/page/0')">Orden de Compra</a>
+          <a class="dropdown-item" (click)="navegarPagina('/orden_venta/page/0')">Orden de Venta</a>
+          <a class="dropdown-item" (click)="navegarPagina('/producto/page/0')">Stock</a>
+        </div>
+      </li>
+
+      <li *ngIf="!_authService.isAuthenticated()"><a [routerLink]="['/login']" class="btn btn-outline-success">Sign In</a></li>
+      <li *ngIf="_authService.isAuthenticated()" class="nav-item dropdown show mx-1">
+        <a class="btn btn-outline-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{ _authService.usuario.username }}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-right dropdown-menu-wide">
+          <li><button (click)="logout()" class="dropdown-item" type="submit">Sign Out</button></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>

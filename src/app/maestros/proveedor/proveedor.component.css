@@ -1,0 +1,7 @@
+.mat-option{
+    background: black !important;
+  }
+  /* color de la seleccion */
+.mat-option.mat-active {
+    background: blue !important;
+  }

@@ -1,0 +1,187 @@
+<div class="container">
+  <br />
+  <div class="btn-toolbar justify-content-between mb-1" role="toolbar" style="width: 100%;">
+    <div class="input-group mb-1" role="toolbar" style="width: 108%;">
+      <div class="row p-0 mx-0 mb-1" style="width: 100%">
+        <div class="col-sm-12 pl-0">
+          <div class="input-group-text border-0 font-weight-bolder text-uppercase pl-0 mr-2" 
+          style="background-color: transparent;">{{ titulo }}</div>
+        </div>
+        <div class="col-sm-12 col-md-3">
+          <div class="row">
+            <div class="input-group-text border-0 col-sm-12 col-md-4 pl-0"
+                 id="NroOrdenCompra"
+                 style="background-color: transparent;">Nro&nbsp;Orden</div>
+            <div class="col-sm-12 col-md-8 pl-0">
+              <input class="form-control text-uppercase" type="text"
+              name="CodigoFiltro" id="CodigoFiltro" maxlength="7"
+              [(ngModel)]="nroOrdenFiltro"
+              (keyup)="filtrar()" />
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-12 col-md-3">
+          <div class="row">
+            <div class="input-group-text border-0 col-sm-12 col-md-4 pl-0" 
+                 id="ordenCompraFechaDesde"
+                 style="background-color: transparent;">Fecha&nbsp;Desde</div>
+            <div class="col-sm-12 col-md-8 pl-0">
+              <input type="date" class="form-control text-uppercase" style="height: 100%;"
+              onkeydown="return false"
+              [ngModel]="fechaDesdeFiltro | date:'yyyy-MM-dd'"
+              (input) = "verificarfecha($event,1)">
+            </div>
+          </div>
+        </div>        
+        <div class="col-sm-12 col-md-3">
+          <div class="row">          
+            <div class="input-group-text border-0 col-sm-12 col-md-4 pl-0" 
+                 id="ordenCompraFechaHasta"
+                 style="background-color: transparent;" >Fecha&nbsp;Hasta</div>
+            <div class="col-sm-12 col-md-8 pl-0">
+              <input type="date" class="form-control text-uppercase" style="height: 100%;"
+              onkeydown="return false"
+              [ngModel]="fechaHastaFiltro | date:'yyyy-MM-dd'"
+              (input) = "verificarfecha($event,2)">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-12 col-md-3 mt-1 pl-0 d-flex justify-content-end">
+          <button type="button" id="btnNuevo" class="btn btn-success border" 
+                  style="height: 35px;" [routerLink] = "['/orden_compra/form']">Nuevo</button>
+        </div>
+      </div>
+      <div class="row p-0 mx-0 mb-1" style="width: 100%">
+          <div class="col-sm-12 col-md-3">
+            <div class="row">
+              <div class="input-group-text border-0 col-sm-12 col-md-4 pl-0"
+                   style="background-color: transparent;">Comprador</div>
+                <div class="col-sm-12 col-md-8 pl-0">
+                  <select *ngIf="usuarios"
+                      class="form-control bg-secondary pt-1"
+                      style="height: 100%;"
+                      [(ngModel)]="compradorFiltro"
+                      [compareWith]="compararUsu"
+                      (change)="filtrar()">
+                    <option [ngValue]="undefined">TODOS</option>
+                    <option *ngFor="let usuario of usuarios" [ngValue]="usuario">{{ usuario }}</option>
+                  </select>
+                </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="row">
+              <div class="input-group-text border-0 col-sm-12 col-md-4 pl-0"
+                   style="background-color: transparent;">Proveedor</div>
+                <div class="col-sm-12 col-md-8 pl-0">
+                  <select *ngIf="proveedores"
+                      class="form-control bg-secondary pt-1"
+                      style="height: 100%;"
+                      [(ngModel)]="proveedorFiltro"
+                      [compareWith]="compararProv"
+                      (change)="filtrar()">
+                    <!--height: 28px; -->
+                    <option [ngValue]="undefined">TODOS</option>
+                    <option *ngFor="let prov of proveedores" [ngValue]="prov">{{ prov.nickname }}</option>
+                  </select>
+                </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="row">
+              <div class="input-group-text border-0 col-sm-12 col-md-4 pl-0"
+                   style="background-color: transparent;">Tipo&nbsp;de&nbsp;Compra</div>
+                <div class="col-sm-12 col-md-8 pl-0">
+                  <select *ngIf="tiposProducto"
+                      class="form-control bg-secondary pt-1"
+                      style="height: 100%;"
+                      [(ngModel)]="tipoCompraFiltro"
+                      [compareWith]="compararAuxDet"
+                      (change)="filtrar()">
+                    <option [ngValue]="undefined">TODOS</option>
+                    <option *ngFor="let tipP of tiposProducto" [ngValue]="tipP">{{ tipP.nombre }}</option>
+                  </select>
+                </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="row">
+              <div class="input-group-text border-0 col-sm-12 col-md-4 pl-0"
+                   style="background-color: transparent;">Tipo&nbsp;de&nbsp;Orden</div>
+                <div class="col-sm-12 col-md-8 pl-0">
+                  <select *ngIf="tiposCompra"
+                      class="form-control bg-secondary pt-1"
+                      style="height: 100%;"
+                      [(ngModel)]="tipoOrdenFiltro"
+                      [compareWith]="compararAuxDet"
+                      (change)="filtrar()">
+                    <option [ngValue]="undefined">TODOS</option>
+                    <option *ngFor="let tipC of tiposCompra" [ngValue]="tipC">{{ tipC.nombre }}</option>
+                  </select>
+                </div>
+            </div>
+          </div>                    
+      </div>
+      <div class="row p-0 mx-0 mb-1" style="width: 100%">
+          <div class="col-sm-12 col-md-3">
+            <div class="row">
+              <div class="input-group-text border-0 col-sm-12 col-md-4 pl-0"
+                   style="background-color: transparent;">Estado</div>
+                <div class="col-sm-12 col-md-8 pl-0">
+                  <select *ngIf="tiposEstadoCompra"
+                      class="form-control bg-secondary pt-1"
+                      style="height: 100%;"
+                      [(ngModel)]="estadoOrdenFiltro"
+                      [compareWith]="compararAuxDet"
+                      (change)="filtrar()">
+                    <option [ngValue]="undefined">TODOS</option>
+                    <option *ngFor="let tipE of tiposEstadoCompra" [ngValue]="tipE">{{ tipE.nombre }}</option>
+                  </select>
+                </div>
+            </div>
+          </div> 
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-start mb-1" role="toolbar" style="width:100%;">
+    <div class="btn-toolbar" role="toolbar">
+      <button type="button" id="btnGenerarExcel" class="btn btn-primary border mr-1" style="height: 35px;" (click)="generarReporte(0)">Generar Excel</button>
+    </div> 
+    <div class="btn-toolbar" role="toolbar">
+      <button type="button" id="btnGenerarPdf" class="btn btn-primary border mr-1" style="height: 35px;" (click)="generarReporte(1)">Generar Pdf</button>
+    </div>     
+  </div> 
+  <div class="mb-1" style="min-height: 350px;">
+    <table class="table-responsive table table-bordered table-hover table-sm">
+      <thead id="thead" class="bg-tevo-green text-dark">
+        <tr style="user-select: none;">
+          <th class="align-middle text-center" style="width:2%;">NRO</th>
+          <th class="align-middle text-center" style="width:10%;" (click)="ordenar('nroOrden')">NRO ORDEN</th>
+          <th class="align-middle text-center" style="width:15%;" (click)="ordenar('proveedor.nickname')">PROVEEDOR</th>
+          <th class="align-middle text-center" style="width:10%;" (click)="ordenar('comprador')">COMPRADOR</th>
+          <th class="align-middle text-center" style="width:10%;" (click)="ordenar('tipoCompra.nombre')">TIPO COMPRA</th>
+          <th class="align-middle text-center" style="width:15%;" (click)="ordenar('tipoOrden.nombre')">TIPO ORDEN</th>
+          <th class="align-middle text-center" style="width:10%;" (click)="ordenar('fechaCompra')">FECHA COMPRA</th>
+          <th class="align-middle text-center" style="width:15%;" (click)="ordenar('total')">MONTO</th>
+          <th class="align-middle text-center" style="width:13%;" (click)="ordenar('estadoOrdenCompra.nombre')">ESTADO</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr *ngFor="let orden of ordenes" class="text-uppercase" (click)="abrirOrden(orden.id)">
+          <td>{{orden.nro}}</td>
+          <td>{{orden.nroOrden}}</td>
+          <td>{{orden.proveedor.nickname}}</td>
+          <td>{{orden.comprador}}</td>
+          <td>{{orden.tipoCompra.nombre}}</td>
+          <td>{{orden.tipoOrden.nombre}}</td>
+          <td class="text-right">{{orden.fechaCompra | date:"dd/MM/yyyy"}}</td>
+          <td class="text-right">{{orden.moneda.valor}} {{orden.total | number : '1.2-2'}}</td>
+          <td>{{orden.estadoOrdenCompra.nombre}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div  [ngStyle]="{'pointer-events': !paginador?'none':'auto'}">
+    <paginator-nav *ngIf="paginador" [paginador] = "paginador" [enlacePaginador]="enlacePaginador"></paginator-nav>
+  </div>
+</div>

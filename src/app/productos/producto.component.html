@@ -1,0 +1,310 @@
+<div class="container">
+  <br />
+  <div class="btn-toolbar justify-content-between mb-2" role="toolbar" style="width: 100%;">
+    <div class="input-group mb-1" role="toolbar" style="width: 100%;">
+        <div class="row" style="width: 100%">
+          <div class="col-sm-12 col-md-2">
+            <div class="input-group-text border-0 font-weight-bolder text-uppercase pl-0 mr-2" style="background-color: transparent;">{{ titulo }}</div>            
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="row">
+              <div class="input-group-text border-0 col-sm-12 col-md-3" style="background-color: transparent;">Fruta</div>
+              <div class="col-sm-12 col-md-9">
+                <input (keyup)="cambiarValorFruta($event);filtrar()" type="text" (blur)="validarFruta($event)"
+                  aria-label="fruta"
+                  matInput
+                  [matAutocomplete]="fru"
+                  class="form-control text-uppercase text-dark"
+                  [(ngModel)]="frutaFiltro"
+                  id="frutaFiltro"
+                  placeholder="FRUTA"
+                  autocomplete="off">
+                <mat-autocomplete #fru="matAutocomplete" [displayWith]="mostrarNombreFruta">
+                  <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let fruta of frutas | async" [value]="fruta">
+                    {{fruta.nombre}}
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="row">
+              <div class="input-group-text border-0 col-sm-12 col-md-3" style="background-color: transparent;">Fruta&nbsp;Var.</div>
+              <div class="col-sm-12 col-md-9">
+                <input (keyup)="cambiarValorFrutaVariedad($event, frutaFiltro.id);filtrar()" type="text" (blur)="validarFrutaVariedad($event)"
+                  aria-label="frutaVariedad"
+                  [disabled]="frutaFiltro === undefined"
+                  matInput
+                  [matAutocomplete]="vari"
+                  class="form-control text-uppercase" style="width: 100%;outline: none;"
+                  [(ngModel)]="variedadFrutaFiltro"
+                  id="variedadFrutaFiltro"
+                  placeholder="VARIEDAD"
+                  autocomplete="off">
+                <mat-autocomplete #vari="matAutocomplete" [displayWith]="mostrarNombreFrutaVariedad">
+                  <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let variedad of variedadFrutas | async" [value]="variedad">
+                    {{variedad.descripcion}}
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="row">
+              <div class="input-group-text border-0 col-sm-12 col-md-3" style="background-color: transparent;">Categoria</div>
+              <div class="col-sm-12 col-md-9">
+                <select *ngIf="categoriasFruta"
+                    class="form-control bg-secondary"
+                    [(ngModel)]="categoriaFiltro"
+                    [compareWith]="compararAuxDet"
+                    (change)="filtrar()">
+                  <option [ngValue]="undefined">TODOS</option>
+                  <option *ngFor="let catFru of categoriasFruta" [ngValue]="catFru">{{ catFru.nombre }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <span class="col-sm-12 col-md-1"></span>
+          <div class="col-sm-12 col-md-3 mt-2" role="toolbar">
+            <button type="button" id="btnGenerarExcel" class="btn btn-primary border mr-1" style="height: 35px;" (click)="generarReporte(0)">Generar Excel</button>
+            <button type="button" id="btnGenerarPdf" class="btn btn-primary border mr-1" style="height: 35px;" (click)="generarReporte(1)">Generar Pdf</button> 
+          </div>            
+        </div>
+    </div>
+  </div>
+  <div class="table-responsive" style="height: 400px;">
+    <table class="table table-bordered table-hover table-sm">
+      <thead id="thead" class="bg-tevo-green text-dark">
+        <tr style="user-select: none;">
+          <th class="align-middle text-center" style="width:2%;">NRO</th>
+          <th class="align-middle text-center" style="width:15%;" (click)="ordenar('frutaVariedad.fruta.nombre')">FRUTA</th>
+          <th class="align-middle text-center" style="width:15%;" (click)="ordenar('frutaVariedad.descripcion')">VARIEDAD</th>
+          <th class="align-middle text-center" style="width:15%;" (click)="ordenar('categoria.nombre')">CATEGORIA</th>
+          <th class="align-middle text-center" style="width:5%;">UNIDAD</th>          
+          <th class="align-middle text-center" style="width:10%;" (click)="ordenar('stock')">STOCK</th>
+          <th class="align-middle text-center" style="width:15%;" (click)="ordenar('fechaUltimaCompra')">F. ULT. COMP.</th>
+          <th class="align-middle text-center" style="width:15%;" (click)="ordenar('fechaUltimaVenta')">F. ULT. VENT.</th>
+          <th class="align-middle text-center" style="width:8%;" (click)="ordenar('fechaUltimaVenta')">CAMBIO CAT.</th>
+        </tr>
+      </thead> 
+      <tbody id="tbody">
+        <tr *ngFor="let producto of productos" class="text-uppercase">
+          <td>{{producto.nro}}</td>
+          <td>{{producto.frutaVariedad.fruta.nombre}}</td>
+          <td>{{producto.frutaVariedad.descripcion}}</td>
+          <td>{{producto.categoria.nombre}}</td>
+          <td>KG</td>
+          <td>{{producto.stock  | number : '1.2-2'}}</td>
+          <td class="text-right">{{producto.fechaUltimaCompra | date:"dd/MM/yyyy"}}</td>
+          <td class="text-right">{{producto.fechaUltimaVenta | date:"dd/MM/yyyy"}}</td>
+          <td>
+            <input (click)="abrirModal(producto)"
+            class="btn btn-success btn-sm" type="button" 
+            data-toggle="modal" data-target="#cambioCategoriaModal"
+            style="width: 100%; height: 100%;" value="CAMBIO CAT."
+            [disabled] = "producto.stock == 0.00"/>
+          </td>
+        </tr>
+      </tbody>           
+    </table>
+  </div>
+  <div  [ngStyle]="{'pointer-events': !paginador?'none':'auto'}">
+    <paginator-nav *ngIf="paginador" [paginador] = "paginador" [enlacePaginador]="enlacePaginador"></paginator-nav>
+  </div>
+</div>
+
+<div (keyup)="cerrarModal($event,1)" class="modal fade" data-backdrop="static" id="cambioCategoriaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalPreviewLabel" aria-hidden="true"
+    style="z-index: 1050;overflow: hidden;  max-height: 100%; overflow-y: auto; max-width:100%;">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cambio Categoria</h5>
+        <button type="button" class="btn btn-success text-white" data-dismiss="modal" aria-label="Close" (click)="cerrarModal($event,2)" id="btnCerrarModal">
+          Regresar
+        </button>
+      </div>
+      <div class="modal-body pt-1">
+        <div class="form-group row mb-0 mt-1" *ngIf="cambioCategoria">
+          <div class="input-group-text border-0 col-sm-12 font-weight-bold" style="background-color: transparent;">Producto Inicio</div>
+          <div class="col-12">
+            <div class="row">
+              <div class="col-sm-12 col-md-3">
+                <div class="row">
+                  <div class="input-group-text border-0 col-sm-12 col-md-3" style="background-color: transparent;">Fruta</div>
+                  <div class="col-sm-12 col-md-9">
+                    <input (keyup)="cambiarValorFruta($event)" type="text" (blur)="validarFruta($event)"
+                      aria-label="fruta" readonly
+                      matInput
+                      [matAutocomplete]="fruModal"
+                      class="form-control text-uppercase"
+                      [(ngModel)]="cambioCategoria.productoInicio.frutaVariedad.fruta"
+                      placeholder="FRUTA"
+                      autocomplete="off">
+                    <mat-autocomplete #fruModal="matAutocomplete" [displayWith]="mostrarNombreFruta">
+                      <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let fruta of frutas | async" [value]="fruta">
+                        {{fruta.nombre}}
+                      </mat-option>
+                    </mat-autocomplete>                  
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-3">
+                <div class="row">
+                  <div class="input-group-text border-0 col-sm-12 col-md-3" style="background-color: transparent;">Fruta&nbsp;Var.</div>
+                  <div class="col-sm-12 col-md-9">
+                    <input (keyup)="cambiarValorFrutaVariedad($event, frutaFiltro.id)" type="text" (blur)="validarFrutaVariedad($event)"
+                      aria-label="frutaVariedad" readonly
+                      matInput
+                      [matAutocomplete]="variModal"
+                      class="form-control text-uppercase"
+                      [(ngModel)]="cambioCategoria.productoInicio.frutaVariedad"
+                      placeholder="VARIEDAD"
+                      autocomplete="off">
+                    <mat-autocomplete #variModal="matAutocomplete" [displayWith]="mostrarNombreFrutaVariedad">
+                      <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let variedad of variedadFrutas | async" [value]="variedad">
+                        {{variedad.descripcion}}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-3">
+                <div class="row">
+                  <div class="input-group-text border-0 col-sm-12 col-md-3" style="background-color: transparent;">Categoria</div>
+                  <div class="col-sm-12 col-md-9">
+                    <select *ngIf="categoriasFruta" disabled
+                        class="form-control bg-secondary"
+                        [(ngModel)]="cambioCategoria.productoInicio.categoria"
+                        [compareWith]="compararAuxDet">
+                      <option [ngValue]="undefined">TODOS</option>
+                      <option *ngFor="let catFru of categoriasFruta" [ngValue]="catFru">{{ catFru.nombre }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div> 
+              <div class="col-sm-12 col-md-3">
+                <div class="row">
+                  <div class="input-group-text border-0 col-sm-12 col-md-3" style="background-color: transparent;">Stock</div>
+                  <div class="col-sm-12 col-md-9">
+                    <input type="text"
+                      aria-label="frutaVariedad" readonly
+                      class="form-control text-uppercase"
+                      [(ngModel)]="cambioCategoria.productoInicio.stock"
+                      placeholder="STOCK">
+                  </div>
+                </div>
+              </div>  
+            </div>
+          </div>
+          <hr class="col-12"/>          
+          <div class="col-12">
+            <div class="row">
+              <div class="input-group-text border-0 col-sm-12 col-md-3 font-weight-bold" style="background-color: transparent;">Producto Final</div>
+              <div class="col-sm-12 col-md-9 d-flex align-items-end flex-column">
+                <div class="row">
+                  <div class="col-12">
+                    <input type="checkbox" class="form-check-input" style="margin-top: 10px"
+                      [disabled]="cambioCategoria.id"
+                      [checked] = "cambioCategoria.blnDescarte" (change) = "modificarIndDescarte()">
+                    <label class="form-check-label mt-2">Descarte</label> 
+                  </div>
+                </div>               
+              </div>              
+            </div>
+          </div>
+          <div class="col-12 py-2" [ngClass]="{'disableDiv': cambioCategoria.blnDescarte === true}">
+            <div class="row">
+              <div class="col-sm-12 col-md-3">
+                <div class="row">
+                  <div class="input-group-text border-0 col-sm-12 col-md-3" style="background-color: transparent;">Fruta</div>
+                  <div class="col-sm-12 col-md-9">
+                    <input (keyup)="cambiarValorFruta($event)" type="text" (blur)="validarFruta($event)"
+                      aria-label="fruta" readonly
+                      matInput
+                      [matAutocomplete]="fruModal"
+                      class="form-control text-uppercase"
+                      [(ngModel)]="cambioCategoria.productoFin.frutaVariedad.fruta"
+                      placeholder="FRUTA"
+                      autocomplete="off">
+                    <mat-autocomplete #fruModal="matAutocomplete" [displayWith]="mostrarNombreFruta">
+                      <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let fruta of frutas | async" [value]="fruta">
+                        {{fruta.nombre}}
+                      </mat-option>
+                    </mat-autocomplete>                  
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-3">
+                <div class="row">
+                  <div class="input-group-text border-0 col-sm-12 col-md-3" style="background-color: transparent;">Fruta&nbsp;Var.</div>
+                  <div class="col-sm-12 col-md-9">
+                    <input (keyup)="cambiarValorFrutaVariedad($event, frutaFiltro.id)" type="text" (blur)="validarFrutaVariedad($event)"
+                      aria-label="frutaVariedad" readonly
+                      matInput
+                      [matAutocomplete]="variModal"
+                      class="form-control text-uppercase"
+                      [(ngModel)]="cambioCategoria.productoFin.frutaVariedad"
+                      placeholder="VARIEDAD"
+                      autocomplete="off">
+                    <mat-autocomplete #variModal="matAutocomplete" [displayWith]="mostrarNombreFrutaVariedad">
+                      <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let variedad of variedadFrutas | async" [value]="variedad">
+                        {{variedad.descripcion}}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-3">
+                <div class="row">
+                  <div class="input-group-text border-0 col-sm-12 col-md-3" style="background-color: transparent;">Categoria</div>
+                  <div class="col-sm-12 col-md-9">
+                    <select *ngIf="categoriasFruta" [disabled]="cambioCategoria.blnDescarte || cambioCategoria.id"
+                        class="form-control bg-secondary"
+                        [(ngModel)]="cambioCategoria.productoFin.categoria"
+                        id="categoriaFrutaFin"
+                        [compareWith]="compararAuxDet"
+                        (change)="buscarProducto()">
+                      <option [ngValue]="undefined">----------</option>
+                      <option *ngFor="let catFru of categoriasFrutaCambioCategoria" [ngValue]="catFru">{{ catFru.nombre }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div> 
+              <div class="col-sm-12 col-md-3">
+                <div class="row">
+                  <div class="input-group-text border-0 col-sm-12 col-md-3" style="background-color: transparent;">Stock</div>
+                  <div class="col-sm-12 col-md-9">
+                    <input type="text"
+                      aria-label="frutaVariedad" readonly
+                      class="form-control text-uppercase"
+                      [(ngModel)]="cambioCategoria.productoFin.stock"
+                      placeholder="STOCK">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> 
+          <hr class="col-12"/> 
+          <div class="col-12">
+            <div class="row">
+              <div class="input-group-text border-0 col-sm-12 font-weight-bold" style="background-color: transparent;">Stock Modificar</div>
+              <div class="col-sm-12 col-md-3">
+                <input appNumbersTwoDecimals type="text" (blur)="validarNuevoStock()"
+                  aria-label="stockCambioCategoria" [disabled]="cambioCategoria.id"
+                  id="stockCambioCategoria"
+                  class="form-control text-uppercase"
+                  [(ngModel)]="cambioCategoria.cantidad"
+                  placeholder="STOCK MODIFICAR">
+            </div>
+            <div class="col-sm-12 col-md-9 d-flex align-items-end flex-column">
+              <button type="button" class="btn btn-success text-white" aria-label="Close" 
+                (click)="guardarCambioCategoria()" [disabled]="cambioCategoria.id">
+                Guardar
+              </button>
+            </div>            
+          </div>                                                
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

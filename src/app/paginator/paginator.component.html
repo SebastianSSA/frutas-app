@@ -1,0 +1,33 @@
+<nav>
+  <div class="btn-toolbar justify-content-between mb-0" style="height: 40px;" role="toolbar">
+    <div class="d-flex justify-content-end">
+			<div class="input-group-text border-0 font-weight-bolder p-0 mr-2" style="background-color: transparent; font-size: 120%; height: 40px;">
+        {{inicio}} al {{fin}} de {{paginador.totalElements}} registros
+      </div>
+		</div>
+    <div class="d-flex justify-content-end">
+      <ul *ngIf="paginas?.length > 0" class="pagination">
+        <li class="page-item" [ngClass]="paginador.first?'disabled':''">
+          <a [routerLink]="['/'+enlacePaginador+'/', paginador.number-1]" class="page-link">&laquo;</a>
+        </li>
+
+        <li class="page-item" [ngClass]="paginador.first?'disabled':''">
+          <a [routerLink]="['/'+enlacePaginador+'/', 0]" class="page-link">Primera</a>
+        </li>
+
+        <li *ngFor="let pagina of paginas" class="page-item" [ngClass]="pagina-1 == paginador.number?'active':''">
+          <span *ngIf="pagina-1 == paginador.number" class="page-link">{{ pagina }}</span>
+          <a *ngIf="pagina-1 != paginador.number" [routerLink]="['/'+enlacePaginador+'/', pagina-1]" class="page-link">{{ pagina }}</a>
+        </li>
+
+        <li class="page-item" [ngClass]="paginador.last?'disabled':''">
+          <a [routerLink]="['/'+enlacePaginador+'/', paginador.totalPages-1]" class="page-link">Ultima</a>
+        </li>
+
+        <li class="page-item" [ngClass]="paginador.last?'disabled':''">
+          <a [routerLink]="['/'+enlacePaginador+'/', paginador.number+1]" class="page-link">&raquo;</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

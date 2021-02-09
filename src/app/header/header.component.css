@@ -1,0 +1,8 @@
+.navbar-nav > .active > a {
+  color: white;
+  background: #00bd4f
+}
+.nav-item > a:hover {
+  color: white;
+  background: #00bd4f
+}

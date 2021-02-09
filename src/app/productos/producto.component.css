@@ -1,0 +1,15 @@
+.disableDiv{
+    pointer-events:none;
+    background-color: #9b9b9b;
+}
+
+.focusRed {
+    outline: 1px solid red;
+    border:1px solid red;
+    box-shadow: 0 0 5px red;
+    background-color:#fff0f0
+}
+
+.focusInput::-webkit-input-placeholder {
+    color: red
+ }

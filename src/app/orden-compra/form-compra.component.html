@@ -1,0 +1,868 @@
+<div class="p-2" *ngIf="ordenCompra.estadoOrdenCompra">
+  <div class="p-2 mt-0">
+    <div class="form-group row my-0">
+      <div class="col-sm-12 col-lg-6 col-xl-4 pr-0">
+        <div class="form-group row mb-0">
+          <label class="col-2 col-form-label pr-0" for="nroOrdenForm">Nro&nbsp;Liq&nbsp;Cmp.</label>
+          <div class="col-sm col-md-4">
+            <input type="text" class="form-control text-uppercase" readonly
+              placeholder="XXXX-{{numAnio}}"
+              [(ngModel)]="ordenCompra.nroOrden" id="nroOrdenForm" style="height: 28px;">
+          </div>
+          <label class="col-2 col-form-label" for="compradorForm">Comprador</label>
+          <div class="col-sm col-md-4">
+            <!-- <input type="text" class="form-control text-uppercase" *ngIf="ordenCompra.comprador" readonly
+              [(ngModel)]="ordenCompra.comprador" id="compradorForm" style="height: 28px;"> -->
+              <!-- [disabled] = "estadoOrdenCompra > 1" -->
+              <select [compareWith]="compararUsu" *ngIf="usuarios"
+                  class="form-control bg-secondary pt-1" disabled
+                  [(ngModel)]="ordenCompra.comprador" id="compradorForm" style="height: 28px;"
+                  (change)="validarCabecera($event)"
+                  (keydown.enter)="saltarSiguienteElemento($event)">
+                <!-- <option [ngValue]="undefined">-----------</option> -->
+                <option *ngFor="let usuario of usuarios" [ngValue]="usuario">{{ usuario }}</option>
+              </select>
+          </div>
+        </div>
+        <div class="form-group row mb-0">
+          <label class="col-2 col-form-label" for="proveedorForm"><u>Proveedor</u></label>
+          <div class="col-sm col-md-4">
+            <select [compareWith]="compararProv" *ngIf="proveedores"
+                class="form-control bg-secondary pt-1"
+                [disabled] = "estadoOrdenCompra > 1"
+                [(ngModel)]="ordenCompra.proveedor" id="proveedorForm" style="height: 28px;"
+                (change)="validarCabecera($event)"
+                (keydown.enter)="saltarSiguienteElemento($event)">
+              <option *ngFor="let prov of proveedores" [ngValue]="prov">{{ prov.nickname }}</option>
+            </select>
+          </div>
+          <label class="col-2 col-form-label" for="monedaForm">Moneda</label>
+          <div class="col-sm col-md-4">
+            <select [compareWith]="compararAux" *ngIf="tiposMoneda"
+                class="form-control bg-secondary pt-1"
+                [disabled] = "estadoOrdenCompra > 1"
+                [(ngModel)]="ordenCompra.moneda" id="monedaForm" style="height: 28px;"
+                (keydown.enter)="saltarSiguienteElemento($event)">
+              <option *ngFor="let tipM of tiposMoneda" [ngValue]="tipM">{{ tipM.nombre }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-12 col-lg-6 col-xl-4 pr-0">
+        <div class="form-group row mb-0">
+          <label class="col-2 col-form-label" for="tipoCompraForm">Producto</label>
+          <div class="col-sm col-md-4">
+            <!-- [disabled] = "estadoOrdenCompra > 1" -->
+            <select [compareWith]="compararAux" *ngIf="tiposProducto"
+                class="form-control bg-secondary pt-1" disabled
+                [(ngModel)]="ordenCompra.tipoCompra" id="tipoCompraForm" style="height: 28px;"
+                (keydown.enter)="saltarSiguienteElemento($event)">
+              <option *ngFor="let tipP of tiposProducto" [ngValue]="tipP">{{ tipP.nombre }}</option>
+            </select>
+          </div>
+          <label class="col-2 col-form-label pr-0" for="tipoOrdenForm">T.&nbsp;Doc&nbsp;Cmp.</label>
+          <div class="col-sm col-md-4">
+            <select [compareWith]="compararAux" *ngIf="tiposCompra"
+                class="form-control bg-secondary pt-1"
+                [disabled] = "estadoOrdenCompra > 1"
+                [(ngModel)]="ordenCompra.tipoOrden" id="tipoOrdenForm" style="height: 28px;"
+                (keydown.enter)="saltarSiguienteElemento($event)">
+              <option *ngFor="let tipC of tiposCompra" [ngValue]="tipC">{{ tipC.nombre }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row mb-0">
+          <label class="col-2 col-form-label" for="lugarCompraForm">Lugar</label>
+          <div class="col-sm col-md-4">
+            <input type="text" class="form-control text-uppercase"
+              [disabled] = "estadoOrdenCompra > 1"
+              [(ngModel)]="ordenCompra.lugarCompra" id="lugarCompraForm" style="height: 28px;"
+              placeholder="Lugar compra" (blur)="validarCabecera($event)"
+              (keydown.enter)="saltarSiguienteElemento($event)">
+          </div>
+          <label class="col-2 col-form-label" for="estadoForm">Estado</label>
+          <div class="col-sm col-md-4">
+            <select [compareWith]="compararAux" *ngIf="tiposEstadoCompra"
+                [disabled] = "estadoOrdenCompra == 1 || estadoOrdenCompra == 3"
+                class="form-control bg-secondary pt-1"
+                [(ngModel)]="ordenCompra.estadoOrdenCompra" id="estadoForm" style="height: 28px;">
+              <option *ngFor="let tipE of tiposEstadoCompra" [ngValue]="tipE">{{ tipE.nombre }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-12 col-lg-12 col-xl-4">
+        <div class="form-group row mb-0">
+          <div class="col-md-6 col-xl-12">
+            <div class="form-group row mb-0">
+              <label class="col-12 col-sm-2 col-md-4 col-lg-2 col-form-label" for="fechaCompraForm">F.Compra</label>
+              <div class="col-7 col-sm-4 col-md-4 col-lg-4 pr-0">
+                <input type="date" class="form-control text-uppercase pr-0" style="text-align: right;"
+                  [disabled] = "estadoOrdenCompra > 1"
+                  [ngModel]="ordenCompra.fechaCompraDate | date:'yyyy-MM-dd'"
+                  (input) = "ordenCompra.fechaCompraDate=$event.target.value"
+                  (blur) ="validarFecha($event,1);validarCabecera($event)"
+                  id="fechaCompraForm" style="height: 28px;"
+                  (keydown.enter)="saltarSiguienteElemento($event)">
+              </div>
+              <div class="col-5 col-sm-3 col-md-2 col-lg-3">
+                <input type="time" class="form-control text-uppercase pr-0"
+                  [disabled] = "estadoOrdenCompra > 1"
+                  [(ngModel)]="ordenCompra.fechaCompraTime"
+                  id="horaCompraForm" style="height: 28px;"
+                  (keydown.enter)="saltarSiguienteElemento($event)">
+              </div>
+              <div class="col-12 col-sm-3 col-md-2 col-lg-3">
+                <div class="form-group form-check mb-0 float-right">
+                  <input type="checkbox" class="form-check-input" style="margin-top: 10px"
+                    [disabled] = "estadoOrdenCompra > 1"
+                    [checked] = "ordenCompra.indIgv" (change) = "modificarIgv()">
+                  <label class="col-sm-1 form-check-label mt-2 px-0">IGV</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-12">
+            <div class="form-group row mb-0">
+              <label class="col-12 col-sm-2 col-md-4 col-lg-2 col-form-label">Total:</label>
+              <div class="col-6 col-sm-4 col-md-4 col-lg-4 pr-0">
+                <input type="text" class="form-control d-none" readonly
+                  [(ngModel)]="ordenCompra.total" style="height: 28px;">
+                <div class="form-control pt-1" style="height: 28px; vertical-align: middle;">{{ ordenCompra.total | number:'1.2-2' }}</div>
+              </div>
+              <div class="col-6 col-sm-4 col-md-4 col-lg-6">
+                <a href="{{urlFoto+'api/orden_compra/pdf/'+ordenCompra.id+'?format=pdf'}}" target="_blank"
+                  class="btn btn-secondary border float-right px-0 pt-1" style="height: 28px; width: 60px;"
+                  *ngIf="estadoOrdenCompra == 3">Imprimir</a>
+                <button type="button" disabled
+                  class="btn btn-secondary border float-right p-0 d-none d-md-none d-lg-block"
+                  style="height: 28px; width: 60px;"
+                  *ngIf="estadoOrdenCompra < 3">Imprimir</button>
+                <button type="button" disabled
+                  class="btn btn-secondary border float-right p-0 d-md-block d-lg-none"
+                  style="height: 28px; width: 30px;"
+                  *ngIf="estadoOrdenCompra < 3">I</button>
+                <button (click)="guardar()" type="button"
+                  class="btn btn-secondary border float-right p-0 mx-1 d-none d-md-none d-lg-block"
+                  style="height: 28px; width: 60px;"
+                  [disabled] = "estadoOrdenCompra == 3"
+                  id="btnGuardar">Guardar</button>
+                <button (click)="guardar()" type="button"
+                  class="btn btn-secondary border float-right p-0 mx-1 d-md-block d-lg-none"
+                  style="height: 28px; width: 30px;"
+                  [disabled] = "estadoOrdenCompra == 3">G</button>
+                <button (click)="agregarCard()" type="button"
+                  class="btn btn-secondary border float-right p-0 d-none d-md-none d-lg-block"
+                  style="height: 28px; width: 60px;"
+                  [disabled] = "estadoOrdenCompra > 1"
+                  id="btnAgregar"
+                  (keydown.enter)="saltarSiguienteElemento($event)">Agregar</button>
+                <button (click)="agregarCard()" type="button"
+                  class="btn btn-secondary border float-right p-0 d-md-block d-lg-none"
+                  style="height: 28px; width: 30px;"
+                  [disabled] = "estadoOrdenCompra > 1">+</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr class="my-1" style="height:2px;border:none;background-color:#375623;"/>
+    <div class="form-group row mb-0 mt-0" style="height: 100%; overflow-y: auto;">
+      <div class="col-sm">
+        <table class="w-100" *ngIf="ordenCompra.detalle">
+          <tbody>
+            <tr *ngFor="let det of ordenCompra.detalle">
+              <div class="form-group row mb-0" style="background-color: #E2EFDA;">
+                <div class="col-sm">
+                  <div class="form-group row mb-0">
+                    <div class="col-sm-4 contenedor-detalle">
+                      <div class="form-group row mb-2">
+                        <div class="font-weight-bold ml-2"><span>{{det.nro}}.</span></div>
+                        <div class="col-sm text-center font-weight-bold">
+                          <ins>FRUTA</ins>
+                        </div>
+                      </div>
+                      <div class="form-group row mb-0">
+                        <div class="col-sm">
+                          <input (keyup)="cambiarValorFruta($event,det)" (blur)="frutaChange(det);validarDetalleBloqueFruta($event,det);" type="text"
+                              aria-label="fruta"
+                              matInput
+                              [placeholder]="det.placeholderFruta"
+                              [matAutocomplete]="fru"
+                              [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueFruta"
+                              [(ngModel)]="det.fruta"
+                              class="form-control text-uppercase place-rojo" style="width: 100%;height: 100%;"
+                              autocomplete="off"
+                              id="fruta_{{det.nro}}"
+                              (keydown.enter)="saltarSiguienteElemento($event)">
+                            <mat-autocomplete #fru="matAutocomplete" [displayWith]="mostrarNombreFruta">
+                              <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let fruta of frutas | async" [value]="fruta">
+                                {{fruta.nombre}}
+                              </mat-option>
+                            </mat-autocomplete>
+                        </div>
+                        <div class="col-sm">
+                          <input (keyup)="cambiarValorFrutaVariedad($event, det)" (blur)="validarDetalleBloqueFruta($event,det)" type="text"
+                              aria-label="frutaVariedad"
+                              matInput
+                              placeholder="Variedad"
+                              [matAutocomplete]="vari"
+                              [disabled] = "estadoOrdenCompra > 1 || det.fruta === undefined || !det.blnHabilitarBloqueFruta"
+                              [(ngModel)]="det.frutaVariedad"
+                              class="form-control text-uppercase" style="width: 100%;height: 100%;"
+                              autocomplete="off"
+                              id="frutaVariedad_{{det.nro}}"
+                              (keydown.enter)="saltarSiguienteElemento($event)">
+                          <mat-autocomplete #vari="matAutocomplete" [displayWith]="mostrarNombreFrutaVariedad">
+                            <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let variedad of variedadFrutas | async" [value]="variedad">
+                              {{variedad.descripcion}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </div>
+                        <div class="col-sm">
+                          <input (keyup)="cambiarValorCategoria($event)" type="text"
+                              aria-label="categoriaFruta"
+                              matInput
+                              placeholder="Categoria"
+                              [matAutocomplete]="cate"
+                              [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueFruta"
+                              [(ngModel)]="det.categoriaFruta"
+                              class="form-control text-uppercase" style="width: 100%;height: 100%;"
+                              autocomplete="off"
+                              id="frutaCategoria_{{det.nro}}"
+                              (blur)="validarDetalleBloqueFruta($event,det)"
+                              (keydown.enter)="saltarSiguienteElemento($event)">
+                          <mat-autocomplete #cate="matAutocomplete" [displayWith]="mostrarNombreCategoria">
+                            <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let categoria of categorias | async" [value]="categoria">
+                              {{categoria.nombre}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </div>
+                      </div>
+                      <div class="form-group row mb-0">
+                        <div class="col-sm">
+                          <input type="text"
+                              placeholder="Procedencia"
+                              [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueFruta"
+                              [(ngModel)]="det.procedencia"
+                              class="form-control text-uppercase" style="width: 100%;height: 100%;"
+                              id="frutaProcedencia_{{det.nro}}"
+                              (keydown.enter)="saltarSiguienteElemento($event)">
+                              <!-- (blur)="validarDetalle(204,det)" -->
+                        </div>
+                        <div class="col-sm">
+                          <input (keyup)="cambiarValorTamano($event)" type="text"
+                              aria-label="tamano"
+                              matInput
+                              placeholder="Tamaño"
+                              [matAutocomplete]="tama"
+                              [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueFruta"
+                              [(ngModel)]="det.tamanoFruta"
+                              class="form-control text-uppercase" style="width: 100%;height: 100%;"
+                              autocomplete="off"
+                              id="frutaTamanio_{{det.nro}}"
+                              (blur)="validarDetalleBloqueFruta($event,det)"
+                              (keydown.enter)="saltarSiguienteElemento($event)">
+                              <!-- (blur)="validarDetalle(205,det)" -->
+                          <mat-autocomplete #tama="matAutocomplete" [displayWith]="mostrarNombreTamano">
+                            <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let tam of tamanos | async" [value]="tam">
+                              {{tam.nombre}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </div>
+                        <div class="col-sm">
+                          <input (keyup)="cambiarValorEstadoFruta($event)" type="text"
+                              aria-label="estadoFruta"
+                              matInput
+                              placeholder="Estado"
+                              [matAutocomplete]="esta"
+                              [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueFruta"
+                              [(ngModel)]="det.estadoFruta"
+                              class="form-control text-uppercase" style="width: 100%;height: 100%;"
+                              autocomplete="off"
+                              id="frutaEstado_{{det.nro}}"
+                              (blur)="validarDetalleBloqueFruta($event,det)"
+                              (keydown.enter)="saltarSiguienteElemento($event)">
+                              <!-- (blur)="validarDetalle(206,det)" -->
+                          <mat-autocomplete #esta="matAutocomplete" [displayWith]="mostrarNombreEstadoFruta">
+                            <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let est of estadoFrutas | async" [value]="est">
+                              {{est.nombre}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </div>
+                      </div>
+                      <div class="form-group row mb-0">
+                        <div class="col-sm">
+                          <textarea placeholder="Observacion (MAX: 200 CARACTERES)" rows="5" maxlength="200"
+                            [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueFruta"
+                            [(ngModel)]="det.observacion"
+                            class="form-control text-uppercase" style="resize: none;"
+                            id="frutaObservacion_{{det.nro}}"
+                            (keydown.enter)="saltarSiguienteElemento($event)"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-4 contenedor-detalle">
+                      <div class="form-group row mb-2">
+                        <div class="col-sm text-center font-weight-bold">
+                          <ins>COMPRA</ins>
+                        </div>
+                      </div>
+                      <div class="form-group row mb-0">
+                        <div class="col-sm-5">
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">U.Medida:</label>
+                            <div class="col-sm py-0">
+                                <!-- [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueCompra" -->
+                                <select [compareWith]="compararAuxDet" disabled
+                                    class="form-control bg-secondary pt-1"
+                                    [(ngModel)]="det.unidadCompra" style="height: 28px;"
+                                    id="unidadMedida_{{det.nro}}"
+                                    (keydown.enter)="saltarSiguienteElemento($event)">
+                                  <option *ngFor="let uniC of unidadesCompra" [ngValue]="uniC">{{ uniC.nombre }}</option>
+                                </select>
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">P.Unitario:</label>
+                            <div class="col-sm py-0">
+                							<input type="text" class="form-control text-uppercase place-rojo" (blur) = "calcularSubTotal(det);validarDetalleBloqueCompra($event,det);"
+                                appNumbersTwoDecimals
+                                placeholder="P.UNITARIO"
+                                [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueCompra"
+                                [(ngModel)]="det.precioUnitario" style="height: 28px;"
+                                id="precioUnitario_{{det.nro}}"
+                                (keydown.enter)="saltarSiguienteElemento($event)">
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Q.Compra:</label>
+                            <div class="col-sm py-0">
+                							<input type="text" class="form-control text-uppercase place-rojo" (blur) = "calcularSubTotal(det);validarDetalleBloqueCompra($event,det);"
+                                appNumbersTwoDecimals
+                                placeholder="Q. COMPRA"
+                                [(ngModel)]="det.cantidadFruta" style="height: 28px;"
+                                [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueCompra"
+                                id="cantidadCompra_{{det.nro}}"
+                                (keydown.enter)="saltarSiguienteElemento($event)">
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Adicional:</label>
+                            <div class="col-sm py-0">
+                							<input type="text" class="form-control text-uppercase"
+                                appNumbersTwoDecimals
+                                placeholder="ADICIONAL"
+                                [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueCompra"
+                                [(ngModel)]="det.cantidadAdicional" style="height: 28px;"
+                                (blur) = "generarEmbalajeGenerico(det);limpiarComboAdicional(det);validarDetalleBloqueCompra($event,det);"
+                                id="adicional_{{det.nro}}"
+                                (keydown.enter)="saltarSiguienteElemento($event)">
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Descuento:</label>
+                            <div class="col-sm py-0">
+                							<input type="text" class="form-control text-uppercase" (blur) = "calcularSubTotal(det);validarDetalleBloqueCompra($event,det);"
+                                appNumbersTwoDecimals
+                                placeholder="DESCUENTO"
+                                [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueCompra"
+                                [(ngModel)]="det.descuento" style="height: 28px;"
+                                id="descuento_{{det.nro}}"
+                                (keydown.enter)="saltarSiguienteElemento($event)">
+                						</div>
+                          </div>
+                          <div class="form-group row mt-0 mb-1">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">P.Total:</label>
+                            <div class="col-sm py-0">
+                							<input type="text" class="form-control text-uppercase d-none" readonly
+                                [(ngModel)]="det.precioTotalIgv" style="height: 28px;">
+                              <div class="form-control pt-1" style="height: 28px; vertical-align: middle;">{{ det.precioTotalIgv | number:'1.2-2' }}</div>
+                						</div>
+                          </div>
+                        </div>
+                        <div class="col-sm-7">
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Forma&nbsp;Pago:</label>
+                            <div class="col-sm">
+                              <select [compareWith]="compararAuxDet"
+                                  class="form-control bg-secondary pt-1"
+                                  [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueCompra"
+                                  [(ngModel)]="det.formaPago" style="height: 28px;"
+                                  (change) = "limpiarFormaPago(det);validarDetalleBloqueCompra($event,det);"
+                                  id="formaPago_{{det.nro}}"
+                                  (keydown.enter)="validarDetalleBloqueCompra($event,det);saltarSiguienteElemento($event);">
+                                <option *ngFor="let fpg of formasPago" [ngValue]="fpg">{{ fpg.nombre }}</option>
+                              </select>
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">F&nbsp;Pago&nbsp;Credito:</label>
+                            <div class="col-sm">
+                							<input type="date" class="form-control text-uppercase pr-0" style="text-align: right;"
+                                *ngIf="det.formaPago"
+                                [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueCompra"
+                                [readonly] = "det.formaPago.nombre != 'CREDITO'"
+                                [(ngModel)]="det.fechaPago" style="height: 28px;"
+                                (blur) ="validarDetalleBloqueCompra($event,det)"
+                                id="fechaPago_{{det.nro}}"
+                                (keydown.enter)="validarDetalleBloqueCompra($event,det);saltarSiguienteElemento($event)">
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Resp.Pago:</label>
+                            <div class="col-sm">
+                							<input type="text" class="form-control text-uppercase"
+                                *ngIf="det.formaPago"
+                                [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueCompra"
+                                [readonly] = "det.formaPago.nombre != 'CREDITO'"
+                                [(ngModel)]="det.responsablePago" style="height: 28px;" (blur)="validarDetalleBloqueCompra($event,det)"
+                                maxlength="30"
+                                id="responsablePago_{{det.nro}}"
+                                (keydown.enter)="validarDetalleBloqueCompra($event,det);saltarSiguienteElemento($event);">
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0 pr-0">Tipo Adic:</label>
+                            <div class="col-sm">
+                              <select [compareWith]="compararAuxDet"
+                                  class="form-control bg-secondary pt-1"
+                                  [(ngModel)]="det.tipoAdicional" style="height: 28px;"
+                                  [disabled] = "det.cantidadAdicional == 0 || estadoOrdenCompra > 1 || !det.blnHabilitarBloqueCompra"
+                                  (change)="validarDetalleBloqueCompra($event,det)"
+                                  (blur)="validarDetalleBloqueCompra($event,det)"
+                                  id="tipoAdicional_{{det.nro}}"
+                                  (keydown.enter)="validarDetalleBloqueCompra($event,det);saltarSiguienteElemento($event);">
+                                <option [ngValue]="undefined">----</option>
+                                <option *ngFor="let tip of tiposAdicional" [ngValue]="tip">{{ tip.nombre }}</option>
+                              </select>
+                						</div>
+                          </div>
+                          <div class="form-group row my-0" style="height: 28px;">
+                          </div>
+                          <div class="form-group row my-0" *ngIf="det.precioTotalIgv<0">
+                            <div class="col-sm text-danger" style="height: 28px;vertical-align: middle;">
+                              PRECIO TOTAL MENOR A 0
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-2 contenedor-detalle">
+                      <div class="form-group row mb-2">
+                        <div class="col-sm text-center font-weight-bold">
+                          <ins>JABAS COMPRADAS</ins>
+                        </div>
+                      </div>
+                      <div class="form-group row mb-0">
+                        <div class="col-sm">
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Nro&nbsp;Jabas:</label>
+                            <div class="col-sm-5 pr-0">
+                							<input type="text" class="form-control text-uppercase py-0"
+                                appOnlyNumbers
+                                placeholder="Q"
+                                [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueJavasCompradas"
+                                [(ngModel)]="det.totalEmpaques" style="height: 28px;"
+                                (blur)="validarDetalleBloqueJavasCompradas($event,det);generarEmbalajeGenerico(det);"
+                                id="nroJavas_{{det.nro}}"
+                                (keydown.enter)="saltarSiguienteElemento($event)">
+                						</div>
+                            <div class="col-sm">
+                              <div class="form-group form-check my-1">
+                                <input type="checkbox" class="form-check-input" disabled
+                                  id="indFinalizadoEmpaque_{{det.nro}}"
+                                  [checked] = "estadoOrdenCompra > 1 || det.indFinalizadoEmpaque">
+                                <label class="col-sm-1 form-check-label pl-0 pt-0.5">Fin</label>
+                              </div>
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-4 mt-1 py-0">Individual:</label>
+                            <div class="col-5">
+                              <div class="form-group form-check my-1 py-0">
+                                <!-- [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueJavasCompradas" -->
+                                <input type="checkbox" class="form-check-input" disabled
+                                  [checked] = "det.indIndividualizar" (change) = "individualizarEmbalaje(det);"
+                                  id="indIndividualizarEmbalaje_{{det.nro}}"
+                                  (keydown.enter)="saltarSiguienteElemento($event)">
+                              </div>
+                						</div>
+                            <div class="col-3">
+                							<button type="button" class="btn btn-secondary border float-right p-0" (click)="abrirModal(det)"
+                                data-toggle="modal" data-target="#empaquetadoModal" style="height: 28px; width: 30px;"
+                                [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueJavasCompradas || det.totalEmpaques==undefined"
+                                id="modalNroJavas_{{det.nro}}"
+                                (keydown.enter)="saltarSiguienteElemento($event)">
+                                <img src="assets/images/search.png">
+                              </button>
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0 pr-0">Tipo Emb:</label>
+                            <div class="col-sm">
+                							<input type="text" class="form-control text-uppercase py-0" readonly
+                                [(ngModel)]="det.tipoEmpaque" style="height: 28px;">
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0 pr-0">Peso Total:</label>
+                            <div class="col-sm">
+                							<input type="text" class="form-control text-uppercase py-0" readonly
+                                [(ngModel)]="det.pesoEmpaque" style="height: 28px;">
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Identificador:</label>
+                            <div class="col-sm">
+                							<input type="text" class="form-control text-uppercase py-0" readonly
+                                style="height: 28px;">
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Foto:</label>
+                            <div class="col-sm">
+                              <input id="{{ 'file-' + det.nro }}" class="form-control text-uppercase py-0" type="file" accept="image/*" style="display: none;"
+                                (change)="cargarFoto($event, det)"/>
+                              <button type="button" class="btn btn-secondary border p-0" (click)="abrirExplorador(det.nro)"
+                                [disabled] = "estadoOrdenCompra > 1 || !det.blnHabilitarBloqueJavasCompradas"
+                                style="height: 28px; width: 30px;"
+                                id="fotoJavasCompradas_{{det.nro}}"
+                                (keydown.enter)="saltarSiguienteElemento($event)">
+                                <img src="assets/images/search.png">
+                              </button>
+                              <a *ngIf="det.fotoEmbalaje && det.fotoEmbalaje !== ''" class="text-success ml-2" href="#fotoEmbalajeModal" data-toggle="modal" data-target="#fotoEmbalajeModal"
+                                (click)="cargarFotoModal(det)">Foto Embalaje</a>
+                						</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-2 contenedor-detalle" style="background-color:#fff2cc;">
+                      <div class="form-group row mb-2">
+                        <div class="col-11 text-center font-weight-bold pr-0">
+                          <ins>RECEPCION</ins>
+                        </div>
+                        <div class="col-1 pr-0">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="quitarCard(det)"
+                            [disabled] = "estadoOrdenCompra > 1">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="form-group row mb-0">
+                        <div class="col-sm">
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Fecha&nbsp;Arribo:</label>
+                            <div class="col-sm">
+                							<input type="date" class="form-control text-uppercase pr-0" [disabled] = "estadoOrdenCompra !== 2"
+                              [ngModel]="det.fechaArriboDate | date:'yyyy-MM-dd'"
+                              (input) = "det.fechaArriboDate=$event.target.value"
+                              style="height: 28px;"
+                              (blur) ="validarDetalleBloqueRecepcion($event,det)"
+                              id="fechaArribo_{{det.nro}}"
+                              (keydown.enter)="saltarSiguienteElemento($event)">
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-6 col-md-4 col-form-label mt-1 py-0 pr-0">Hora&nbsp;Arribo:</label>
+                            <div class="col-6 col-md-4">
+                							<input type="time" class="form-control text-uppercase pr-0" [disabled] = "estadoOrdenCompra !== 2"
+                                [(ngModel)]="det.fechaArriboTime" style="height: 28px;width: 75px;"
+                                (blur)="validarDetalleBloqueRecepcion($event,det)"
+                                id="horaArribo_{{det.nro}}"
+                                (keydown.enter)="saltarSiguienteElemento($event)">
+                            </div>
+                            <div class="col-12 col-md-1 ml-1">
+                              <div class="form-group form-check my-1">
+                                <input type="checkbox" class="form-check-input" disabled
+                                  id="indFinalizadoRecepcion_{{det.nro}}"
+                                  [checked] = "estadoOrdenCompra != 1 && det.indFinalizadoEmpaque">
+                                <label class="col-1 form-check-label pl-1">Fin</label>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-4 col-form-label mt-1 py-0">Merma:</label>
+                            <div class="col-6">
+                              <div class="form-group form-check my-1 py-0" style="height: 20px;">
+                                <input type="checkbox" class="form-check-input" [disabled] = "estadoOrdenCompra !== 2"
+                                  [checked] = "det.indMerma" (change) = "indMermaChange(det)"
+                                  id="indMerma_{{det.nro}}"
+                                  (keydown.enter)="saltarSiguienteElemento($event)">
+                              </div>
+                						</div>
+                            <div class="col-1">
+                							<button type="button" class="btn btn-secondary border float-right p-0" (click)="abrirModal(det)"
+                                data-toggle="modal" data-target="#empaquetadoModal" style="height: 28px; width: 30px;"
+                                [disabled] = "estadoOrdenCompra == 1"
+                                id="modalRecepcion_{{det.nro}}"
+                                (keydown.enter)="saltarSiguienteElemento($event)">
+                                <img src="assets/images/search.png">
+                              </button>
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Q.Merma:</label>
+                            <div class="col-sm">
+                							<input type="text" class="form-control text-uppercase" disabled
+                                [(ngModel)]="det.pesoMerma" style="height: 28px;">
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Cat.Merma:</label>
+                            <div class="col-sm">
+                							<input type="text" class="form-control text-uppercase" disabled
+                                 [(ngModel)]="det.tipoMerma" style="height: 28px;">
+                						</div>
+                          </div>
+                          <div class="form-group row my-0">
+                            <label class="col-sm-4 col-form-label mt-1 py-0">Foto:</label>
+                            <div class="col-sm">
+                              <input id="{{ 'filem-' + det.nro }}" class="form-control text-uppercase py-0" type="file" accept="image/*" style="display: none;"
+                                (change)="cargarFotoM($event, det)"/>
+                              <button type="button" class="btn btn-secondary border p-0" (click)="abrirExploradorM(det.nro)"
+                                [disabled] = "estadoOrdenCompra !== 2"
+                                style="height: 28px; width: 30px;"
+                                id="fotoRecepcion_{{det.nro}}"
+                                (keydown.enter)="saltarSiguienteElemento($event)">
+                                <img src="assets/images/search.png">
+                              </button>
+                              <a *ngIf="det.fotoMerma && det.fotoMerma !== ''" class="text-success ml-2" href="#fotoEmbalajeModal" data-toggle="modal" data-target="#fotoEmbalajeModal"
+                                (click)="cargarFotoModal(det)">Foto Embalaje</a>
+                						</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div (keyup)="cerrarModal($event, 1)" class="modal fade" data-backdrop="static" id="empaquetadoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalPreviewLabel" aria-hidden="true"
+    style="z-index: 1050;overflow: hidden;  max-height: 100%; overflow-y: auto;" *ngIf="ordenCompra.estadoOrdenCompra">
+  <div class="modal-dialog modal-dialog-centered" role="document" [ngStyle]="{'max-width.%': estadoOrdenCompra>1?'80':'40'}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Embalaje</h5>
+        <button type="button" class="btn btn-success text-white" data-dismiss="modal" aria-label="Close" (click)="cerrarModal($event, 2)" id="btnCerrarModal">
+          Regresar registro
+        </button>
+      </div>
+      <div class="modal-body pt-1">
+        <div class="form-group row my-0" style="height: 30px;">
+          <div class="col-sm">
+            <div class="form-group form-check float-right">
+              <input type="checkbox" class="form-check-input"
+                [disabled] = "estadoOrdenCompra === 3"
+                [checked] = "indFinalizadoEmp"
+                (change) = "indFinalizadoChange($event,empaques);"
+                id="registroFinalizado"
+                (keydown.enter)="saltarSiguienteElemento($event)">
+              <label class="col-sm form-check-label">Registro Finalizado</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group row mb-0 mt-1 justify-content-center">
+          <div class="col-sm-12" style="height: 360px; overflow-y: auto;width:100%;">
+            <table class="w-100" class="table table-bordered table-hover table-sm table-responsive">
+              <thead class="bg-tevo-green text-white">
+                <tr style="user-select: none;">
+                  <th></th>
+                  <th colspan="3" class="align-middle text-center">Compra</th>
+                  <th *ngIf="estadoOrdenCompra > 1" colspan="3" class="align-middle text-center">Recepcion</th>
+                  <th *ngIf="indMerma" colspan="2" class="align-middle text-center">Merma 1</th>
+                  <th *ngIf="indMerma" colspan="2" class="align-middle text-center">Merma 2</th>
+                </tr>
+                <tr style="user-select: none;">
+                  <th class="align-middle text-center" style="width:2%;">Nro</th>
+                  <th class="align-middle text-center" style="width:4%;">Emp.</th>
+                  <th class="align-middle text-center" style="width:10%;">Tipo</th>
+                  <th class="align-middle text-center" style="width:9%;">Unidad: {{unidadMedida}}</th>
+                  <th *ngIf="estadoOrdenCompra > 1" class="align-middle text-center" style="width:10%;">Identificador</th>
+                  <th *ngIf="estadoOrdenCompra > 1" class="align-middle text-center" style="width:10%;">No Ingreso</th>
+                  <th *ngIf="estadoOrdenCompra> 1" class="align-middle text-center" style="width:8%;">Peso Recep.</th>
+                  <th *ngIf="indMerma" class="align-middle text-center">Categoria</th>
+                  <th *ngIf="indMerma" class="align-middle text-center" style="width:5%;">Peso</th>
+                  <th *ngIf="indMerma" class="align-middle text-center">Categoria</th>
+                  <th *ngIf="indMerma" class="align-middle text-center" style="width:5%;">Peso</th>
+                  <th *ngIf="estadoOrdenCompra > 1" class="align-middle text-center" style="width:15%;">Almacen</th>
+                  <th class="align-middle text-center" style="width:1%; padding: 0.15rem; vertical-align: middle;">
+                    <button type="button" class="btn btn-success btn-sm p-1.5" (click)="agregarEmpaque()"
+                      [disabled] = "estadoOrdenCompra > 1 || empaques.length>20  || !indIndividualizar"
+                      id="btnAgregarDetalle">
+                      <span aria-hidden="true">&#43;</span>
+                    </button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let empaque of empaques; let i = index" class="text-uppercase">
+                  <td style="height: 2em;">{{empaque.nro}}</td>
+                  <td contenteditable="false" style="height: 2em;">
+                    <input disabled type="text" class="border-0 text-uppercase bg-transparent" style="width: 100%;outline: none;height: 98%;" value="JABA">
+                  </td>
+                  <td contenteditable="false" style="position: relative;overflow: hidden;height: 2em;">
+                    <select [compareWith]="compararStemp"
+                        class="form-control bg-secondary pt-1"
+                        [(ngModel)]="empaque.subTipoEmpaque" style="height: 98%; width: 95%; position: absolute; top: 1px"
+                        [disabled]="empaque.id || !indIndividualizar" (change)="tipoEmbalajeChange($event,empaque.nro);validarEmpaque($event,empaque)"
+                        (blur)="validarEmpaque($event,empaque)"
+                        id="tipoEmpaque_{{empaque.nro}}"
+                        (keydown.enter)="validarEmpaque($event,empaque);saltarSiguienteElemento($event);">
+                      <option [ngValue]="undefined">----</option>
+                      <option *ngFor="let subT of subTiposEmpaque" [ngValue]="subT">{{ subT.nombre }}</option>
+                    </select>
+                  </td>
+                  <td contenteditable="false" style="height: 2em;">
+                    <input type="text" class="border-0 text-uppercase bg-transparent" style="width: 100%;outline: none;height: 98%;"
+                      [(ngModel)]="empaque.pesoCompra"
+                      appNumbersTwoDecimals [disabled]="empaque.id || !empaque.subTipoEmpaque" (blur)="validarEmpaque($event,empaque)"
+                      id="empaquePeso_{{empaque.nro}}"
+                      (keydown.enter)="saltarSiguienteElemento($event)">
+                  </td>
+                  <td *ngIf="estadoOrdenCompra > 1" contenteditable="false" style="height: 2em;">
+                    <input disabled type="text" class="border-0 text-uppercase bg-transparent" style="width: 100%;outline: none;height: 98%;"
+                    [(ngModel)]="empaque.identificador"
+                    id="empaqueIdentificador_{{empaque.nro}}"
+                    (keydown.enter)="saltarSiguienteElemento($event)">
+                  </td>
+                  <td *ngIf="estadoOrdenCompra > 1" contenteditable="false" style="position:relative;overflow:hidden;height:2em;">
+                    <select [compareWith]="compararAuxDet"
+                        class="form-control bg-secondary pt-1"
+                        [disabled] = "estadoOrdenCompra === 3"
+                        [(ngModel)]="empaque.motivoNoIngreso" style="height: 98%; width: 95%; position: absolute; top: 1px"
+                        (change)="noIngresoChange($event,empaque.nro)"
+                        id="empaqueMotivoNoIngreso_{{empaque.nro}}"
+                        (blur)="validarEmpaque($event,empaque)"
+                        (keydown.enter)="saltarSiguienteElemento($event)">
+                      <option [ngValue]="undefined">----</option>
+                      <option *ngFor="let mot of motivosNoIngreso" [ngValue]="mot">{{ mot.nombre }}</option>
+                    </select>
+                  </td>
+                  <td *ngIf="estadoOrdenCompra > 1" contenteditable="false" style="height: 2em;">
+                    <input type="text" class="border-0 text-uppercase bg-transparent" style="width: 100%;outline: none;height: 98%;"
+                      appNumbersTwoDecimals
+                      [(ngModel)]="empaque.pesoRecepcion"
+                      [disabled] = "estadoOrdenCompra === 3 || empaque.motivoNoIngreso"
+                      (blur)="validarEmpaque($event,empaque)"
+                      id="empaquePesoRecepcion_{{empaque.nro}}"
+                      (keydown.enter)="saltarSiguienteElemento($event)">
+                  </td>
+                  <td *ngIf="indMerma" contenteditable="false" style="position:relative;overflow:hidden;height:2em;">
+                    <select [compareWith]="compararAux"
+                        class="form-control bg-secondary pt-1"
+                        [disabled] = "estadoOrdenCompra === 3 || empaque.motivoNoIngreso != undefined"
+                        [(ngModel)]="empaque.categoriaMerma1" style="height: 98%; width: 95%; position: absolute; top: 1px"
+                        (change)="tipoMermaChange($event,empaque.nro,1)"
+                        id="empaqueTipoMerma1_{{empaque.nro}}"
+                        (keydown.enter)="saltarSiguienteElemento($event)">
+                      <option [ngValue]="undefined">----</option>
+                      <option *ngFor="let me1 of categoriasMerma1" [ngValue]="me1">{{ me1.nombre }}</option>
+                    </select>
+                  </td>
+                  <td *ngIf="indMerma" contenteditable="false" style="height: 2em;">
+                    <input type="text" class="border-0 text-uppercase bg-transparent" style="width: 100%;outline: none;height: 98%;"
+                      appNumbersTwoDecimals
+                      [(ngModel)]="empaque.pesoMerma1"
+                      [disabled] = "estadoOrdenCompra === 3 || empaque.categoriaMerma1 == undefined"
+                      (blur)="validarEmpaque($event,empaque)"
+                      id="empaquePesoMerma1_{{empaque.nro}}"
+                      (keydown.enter)="saltarSiguienteElemento($event)">
+                  </td>
+                  <td *ngIf="indMerma" contenteditable="false" style="position:relative;overflow:hidden;height:2em;">
+                    <select [compareWith]="compararAux"
+                        class="form-control bg-secondary pt-1"
+                        [disabled] = "estadoOrdenCompra === 3 || empaque.motivoNoIngreso != undefined || empaque.categoriaMerma1 == undefined"
+                        [(ngModel)]="empaque.categoriaMerma2" style="height: 98%; width: 95%; position: absolute; top: 1px"
+                        (change)="tipoMermaChange($event,empaque.nro,2)"
+                        id="empaqueTipoMerma2_{{empaque.nro}}"
+                        (keydown.enter)="saltarSiguienteElemento($event)">
+                      <option [ngValue]="undefined">----</option>
+                      <option *ngFor="let me2 of categoriasMerma2" [ngValue]="me2">{{ me2.nombre }}</option>
+                    </select>
+                  </td>
+                  <td *ngIf="indMerma" contenteditable="false" style="height: 2em;">
+                    <input type="text" class="border-0 text-uppercase bg-transparent" style="width: 100%;outline: none;height: 98%;"
+                      appNumbersTwoDecimals
+                      [(ngModel)]="empaque.pesoMerma2"
+                      [disabled] = "estadoOrdenCompra === 3 || empaque.categoriaMerma2 == undefined"
+                      (blur)="validarEmpaque($event,empaque)"
+                      id="empaquePesoMerma2_{{empaque.nro}}"
+                      (keydown.enter)="saltarSiguienteElemento($event)">
+                  </td>
+                  <td *ngIf="estadoOrdenCompra > 1" contenteditable="false" style="position:relative;overflow:hidden;height:2em;">
+                    <select [compareWith]="compararAlm"
+                        class="form-control bg-secondary pt-1"
+                        [disabled] = "estadoOrdenCompra === 3 || empaque.motivoNoIngreso != undefined"
+                        [(ngModel)]="empaque.almacen" style="height: 98%; width: 95%; position: absolute; top: 1px"
+                        (change)="validarEmpaque($event,empaque)"
+                        (blur)="validarEmpaque($event,empaque)"
+                        id="empaqueAlmacen_{{empaque.nro}}"
+                        (keydown.enter)="saltarSiguienteElemento($event)">
+                      <option [ngValue]="undefined">----</option>
+                      <option *ngFor="let alm of almacenes" [ngValue]="alm">{{ alm.descripcion }}</option>
+                    </select>
+                  </td>
+                  <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 2em;" align="center">
+                    <button type="button" class="btn btn-danger btn-sm p-1.5" (click)="quitarEmpaque(empaque)"
+                        [disabled] = "empaque.id || !indIndividualizar"
+                        id="btnBorrarEmpaque_{{empaque.nro}}">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-sm-12" style="width:100%;"  *ngIf="empaques.length>0">
+            <div class="col-sm-12" style="width:100%;">
+              ∆Peso = {{this.totalDiferencia | number : '1.2-2'}}
+            </div>
+            <div class="col-sm-12" style="width:100%;">
+              <table class="w-100" class="table table-bordered table-hover table-responsive">
+                <thead style="width:100%;">
+                  <tr class="bg-tevo-green text-white" style="user-select: none;">
+                    <th id="totalCantidadMasAdicional" style="width:16.66%;" class="align-middle text-center">Peso Compra= <strong>{{this.totalCantidadMasAdicional | number : '1.2-2'}} {{unidadMedida}}</strong></th>
+                    <th id="totalPesoJavas" style="width:16.66%;" class="align-middle text-center">Peso Javas= <strong>{{this.totalPesoJavas}} {{unidadMedida}}</strong></th>
+                    <th id="totalPesoNoIngreso" style="width:16.66%;" *ngIf="estadoOrdenCompra > 1" class="align-middle text-center">No ingreso= <strong>{{this.totalPesoNoIngreso | number : '1.2-2'}} {{unidadMedida}}</strong></th>
+                    <th id="totalPesoRecepcion" style="width:16.66%;" *ngIf="estadoOrdenCompra > 1" class="align-middle text-center">Peso Recepcion= <strong>{{this.totalPesoRecepcion | number : '1.2-2'}} {{unidadMedida}}</strong></th>
+                    <th id="totalPesoMerma1" style="width:16.66%;" *ngIf="indMerma" class="align-middle text-center">Peso Merma1= <strong>{{this.totalPesoMerma1 | number : '1.2-2'}} {{unidadMedida}}</strong></th>
+                    <th id="totalPesoMerma2" style="width:16.66%;" *ngIf="indMerma" class="align-middle text-center">Peso Merma2= <strong>{{this.totalPesoMerma2 | number : '1.2-2'}} {{unidadMedida}}</strong></th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="fotoEmbalajeModal" tabindex="-1" role="dialog" aria-labelledby="fotoEmbalajeModal" aria-hidden="true"
+    *ngIf="ordenCompra.estadoOrdenCompra">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img *ngIf="fotoEmbalajeSeleccionada" [src]="fotoEmbalajeSeleccionada" class="border bg-secondary"
+          style="display: block; margin-left: auto ;margin-right: auto; width: 80%;"/>
+      </div>
+    </div>
+  </div>
+</div>

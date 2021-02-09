@@ -1,0 +1,476 @@
+<div class="p-2" *ngIf="ordenVenta.estadoOrdenVenta">
+  <div class="p-2 mt-0">
+    <div class="form-group row my-0">
+      <div class="col-sm-4">
+        <div class="form-group row mb-0">
+          <label class="col-sm-2 col-form-label pr-0" for="nroOrdenForm">Nº Liq Vta</label>
+          <div class="col-sm">
+            <input type="text" class="form-control text-uppercase" readonly
+              placeholder="XXXX_{{numAnio}}"
+              [(ngModel)]="ordenVenta.nroOrden" id="nroOrdenForm" style="height: 28px;">
+          </div>
+          <label class="col-sm-2 col-form-label" for="vendedorForm">Vendedor</label>
+          <div class="col-sm">
+              <select [compareWith]="compararUsu" *ngIf="usuarios"
+                  class="form-control bg-secondary pt-1" disabled
+                  [(ngModel)]="ordenVenta.vendedor" id="vendedorForm" style="height: 28px;"
+                  [disabled]="estadoOrdenVenta > 1"
+                  (keydown.enter)="saltarSiguienteElemento($event)">
+                <option *ngFor="let usuario of usuarios" [ngValue]="usuario">{{ usuario }}</option>
+              </select>
+          </div>
+        </div>
+        <div class="form-group row mb-0">
+          <label class="col-sm-2 col-form-label" for="almacenForm">Almacen</label>
+          <div class="col-sm">
+            <select [compareWith]="compararAlm" *ngIf="almacenes"
+                class="form-control bg-secondary pt-1"
+                [disabled] = "estadoOrdenVenta > 1"
+                [(ngModel)]="ordenVenta.almacen" id="almacenForm" style="height: 28px;"
+                [disabled]="estadoOrdenVenta > 1"
+                (keydown.enter)="saltarSiguienteElemento($event)">
+              <option *ngFor="let alm of almacenes" [ngValue]="alm">{{ alm.descripcion }}</option>
+            </select>
+          </div>
+          <label class="col-sm-2 col-form-label mt-1 py-0" for="monedaForm">Moneda</label>
+          <div class="col-sm py-0">
+            <select [compareWith]="compararAux" *ngIf="tiposMoneda"
+                class="form-control bg-secondary pt-1"
+                [disabled] = "estadoOrdenVenta > 1"
+                [(ngModel)]="ordenVenta.moneda" id="monedaForm" style="height: 28px;"
+                (keydown.enter)="saltarSiguienteElemento($event)">
+              <option *ngFor="let tipM of tiposMoneda" [ngValue]="tipM">{{ tipM.nombre }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-group row mb-0">
+          <label class="col-sm-2 col-form-label" for="tipoVentaForm">Producto</label>
+          <div class="col-sm">
+            <select [compareWith]="compararAux" *ngIf="tiposProducto"
+                class="form-control bg-secondary pt-1"
+                [disabled] = "estadoOrdenVenta > 1"
+                [(ngModel)]="ordenVenta.tipoVenta" id="tipoVentaForm" style="height: 28px;"
+                (keydown.enter)="saltarSiguienteElemento($event)">
+              <option *ngFor="let tipP of tiposProducto" [ngValue]="tipP">{{ tipP.nombre }}</option>
+            </select>
+          </div>
+          <label class="col-sm-2 col-form-label pr-0" for="tipoOrdenForm">T. Doc Vta</label>
+          <div class="col-sm">
+            <select [compareWith]="compararAux" *ngIf="tiposVenta"
+                class="form-control bg-secondary pt-1"
+                [disabled] = "estadoOrdenVenta > 1"
+                [(ngModel)]="ordenVenta.tipoOrdenVenta" id="tipoOrdenForm" style="height: 28px;"
+                (keydown.enter)="saltarSiguienteElemento($event)">
+              <option *ngFor="let tipV of tiposVenta" [ngValue]="tipV">{{ tipV.nombre }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group row mb-0">
+          <label class="col-sm-2 col-form-label" for="tipoClienteForm">T.Cliente</label>
+          <div class="col-sm-4">
+            <select [compareWith]="compararAux" *ngIf="tiposCliente"
+                class="form-control bg-secondary pt-1"
+                [(ngModel)]="ordenVenta.tipoCliente" id="tipoClienteForm" style="height: 28px;"
+                [disabled] = "estadoOrdenVenta > 1"
+                (keydown.enter)="saltarSiguienteElemento($event)">
+              <option *ngFor="let tipCli of tiposCliente" [ngValue]="tipCli">{{ tipCli.nombre }}</option>
+            </select>
+          </div>
+          <label class="col-sm-2 col-form-label" for="clienteForm">Cliente</label>
+          <div class="col-sm-4" *ngIf="ordenVenta.tipoCliente">
+            <div class="form-group row mb-0">
+              <div class="col-sm" *ngIf="ordenVenta.tipoCliente.tablaAuxiliarDetalleId.id == 1">
+                <select [compareWith]="compararCli" *ngIf="tiposCliente"
+                    class="form-control bg-secondary pt-1"
+                    id="clienteInternoForm"
+                    [(ngModel)]="ordenVenta.cliente" style="width: 100%; height: 28px;"
+                    (change)="validarCabecera($event)" [disabled] = "estadoOrdenVenta > 1"
+                    placeholder="CLIENTE EXTERNO"
+                    (blur)="validarCabecera($event)"
+                    (keydown.enter)="saltarSiguienteElemento($event)">
+                  <option [ngValue]="undefined">----</option>
+                  <option *ngFor="let cli of clientes" [ngValue]="cli">{{ cli.nombreCliente }}</option>
+                </select>
+              </div>
+              <div class="col-sm" *ngIf="ordenVenta.tipoCliente.tablaAuxiliarDetalleId.id !== 1">
+                <input type="text" class="form-control text-uppercase" title="{{ordenVenta.nombreCliente | titlecase}}"
+                  [(ngModel)]="ordenVenta.nombreCliente"
+                  id="clienteExternoForm"
+                  style="height: 28px;"
+                  (blur)="validarCabecera($event)"
+                  (keydown.enter)="saltarSiguienteElemento($event)">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-group row mb-0">
+          <label class="col-sm-2 col-form-label" for="fechaVentaForm">F.Venta</label>
+          <div class="col-sm-5">
+            <input type="date" class="form-control text-uppercase"
+              [disabled] = "estadoOrdenVenta > 1"
+              [ngModel]="ordenVenta.fechaVentaDate | date:'yyyy-MM-dd'"
+              (input) = "ordenVenta.fechaVentaDate=$event.target.value"
+              id="fechaVentaForm" style="height: 28px;" (blur)="validarFecha($event);validarCabecera($event);"
+              (keydown.enter)="saltarSiguienteElemento($event)">
+          </div>
+          <div class="col-sm-3">
+            <input type="time" class="form-control text-uppercase"
+              [disabled] = "estadoOrdenVenta > 1"
+              [(ngModel)]="ordenVenta.fechaVentaTime"
+              id="horaVentaForm" style="height: 28px;"
+              (keydown.enter)="saltarSiguienteElemento($event)">
+          </div>
+          <div class="col-sm-2">
+            <div class="form-group form-check mb-0 float-right">
+              <input type="checkbox" class="form-check-input" style="margin-top: 10px"
+                [checked] = "ordenVenta.indIgv" (change) = "modificarIgv()">
+              <label class="col-sm-1 form-check-label mt-2 px-0">IGV</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row mb-0">
+          <label class="col-sm-2 col-form-label" for="estadoForm">Estado</label>
+          <div class="col-sm-4">
+            <select [compareWith]="compararAux" *ngIf="tiposEstadoVenta"
+                [disabled] = "estadoOrdenVenta == 1"
+                class="form-control bg-secondary pt-1"
+                [(ngModel)]="ordenVenta.estadoOrdenVenta" id="estadoForm" style="height: 28px;">
+              <option *ngFor="let tipE of tiposEstadoVenta" [ngValue]="tipE">{{ tipE.nombre }}</option>
+            </select>
+          </div>
+          <div class="col-sm">
+            <button (click)="guardar()" type="button" class="btn btn-secondary border float-right p-0 ml-2"
+              style="height: 28px; width: 70px;" [disabled] = "estadoOrdenVenta == 3"
+              id="btnGuardar">Guardar</button>
+            <button (click)="agregarCard()" type="button" class="btn btn-secondary border float-right p-0"
+              style="height: 28px; width: 70px;" [disabled] = "estadoOrdenVenta > 1"
+              id="btnAgregar" (keydown.enter)="saltarSiguienteElemento($event)">Agregar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr class="my-1" style="height:2px;border:none;background-color:#375623;"/>
+    <div class="form-group row m-0" [ngStyle]="{'height': altoPantalla}" style="width: 100%; overflow-y: auto; overflow-x: hidden;">
+      <div class="col-sm px-0">
+        <table class="w-100 table table-bordered table-hover table-sm" *ngIf="ordenVenta.detalle">
+          <tbody>
+            <tr *ngFor="let det of ordenVenta.detalle; let i = index">
+              <div class="form-group row mb-0 bg-white">
+                <div class="col-sm">
+                  <table class="table table-bordered table-hover table-sm table-responsive w-100 mb-0">
+                    <thead class="bg-tevo-green text-dark">
+                      <tr style="user-select: none;">
+                        <th class="align-middle text-center" style="width:2%;">Nro</th>
+                        <th class="align-middle text-center" style="width:7%;">Producto</th>
+                        <th class="align-middle text-center" style="width:6%;">Variedad</th>
+                        <th class="align-middle text-center" style="width:5%;">Categ</th>
+                        <th class="align-middle text-center" style="width:6%;">Tamaño</th>
+                        <th class="align-middle text-center" style="width:5%;">Cant</th>
+                        <th class="align-middle text-center" style="width:3%;">Unid</th>
+                        <th class="align-middle text-center" style="width:5%;">P.Unit</th>
+                        <th class="align-middle text-center" style="width:5%;">P.Tot</th>
+                        <th class="align-middle text-center" style="width:5%;">Dcto</th>
+                        <th class="align-middle text-center" style="width:5%;">P.Dcto</th>
+                        <th class="align-middle text-center" style="width:5%;">Igv</th>
+                        <th class="align-middle text-center" style="width:5%;">P.Final</th>
+                        <th class="align-middle text-center">Observacion</th>
+                        <th class="align-middle text-center" style="width:3%;">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="quitarCard(det)"
+                            [disabled] = "estadoOrdenVenta > 1" style="width:100%;">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td contenteditable="false" class="text-center text-dark"
+                            style="padding: 0.15rem; vertical-align: middle;height: 30px;">{{det.nro}}</td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <input (keyup)="cambiarValorFruta($event)" (blur)="validarDetalleCabecera($event,det)" type="text"
+                            aria-label="fruta"
+                            matInput
+                            [matAutocomplete]="fru"
+                            class="border-0 text-uppercase bg-transparent text-dark" style="width: 100%;height: 100%;outline: none;"
+                            [(ngModel)]="det.fruta"
+                            id="fruta_{{det.nro}}"
+                            placeholder="FRUTA"
+                            autocomplete="off" [disabled] = "estadoOrdenVenta > 1 || det.empaques.length > 0"
+                            (keydown.enter)="saltarSiguienteElemento($event)">
+                          <mat-autocomplete #fru="matAutocomplete" [displayWith]="mostrarNombreFruta">
+                            <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let fruta of frutas | async" [value]="fruta">
+                              {{fruta.nombre}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <input (keyup)="cambiarValorFrutaVariedad($event, det.fruta.id)" (blur)="validarDetalleCabecera($event,det)" type="text"
+                            aria-label="frutaVariedad"
+                            matInput
+                            [matAutocomplete]="vari"
+                            [disabled] = "estadoOrdenVenta > 1 || det.fruta === undefined || det.empaques.length > 0"
+                            class="border-0 text-uppercase bg-transparent text-dark" style="width: 100%;height: 100%;outline: none;"
+                            [(ngModel)]="det.frutaVariedad"
+                            id="frutaVariedad_{{det.nro}}"
+                            placeholder="VARIEDAD"
+                            autocomplete="off"
+                            (keydown.enter)="saltarSiguienteElemento($event)">
+                          <mat-autocomplete #vari="matAutocomplete" [displayWith]="mostrarNombreFrutaVariedad">
+                            <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let variedad of variedadFrutas | async" [value]="variedad">
+                              {{variedad.descripcion}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <input (keyup)="cambiarValorCategoria($event)" (blur)="validarDetalleCabecera($event,det)" type="text"
+                            aria-label="categoriaFruta"
+                            matInput
+                            [matAutocomplete]="cate"
+                            class="border-0 text-uppercase bg-transparent text-dark" style="width: 100%;height: 100%;outline: none;"
+                            [(ngModel)]="det.categoriaFruta"
+                            id="frutaCategoria_{{det.nro}}"
+                            [disabled] = "estadoOrdenVenta > 1 || det.empaques.length > 0"
+                            autocomplete="off" [disabled] = "estadoOrdenVenta > 1"
+                            (keydown.enter)="saltarSiguienteElemento($event)">
+                          <mat-autocomplete #cate="matAutocomplete" [displayWith]="mostrarNombreCategoria">
+                            <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let categoria of categorias | async" [value]="categoria">
+                              {{categoria.nombre}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <input (keyup)="cambiarValorTamano($event)" (blur)="validarDetalleCabecera($event,det)" type="text"
+                            aria-label="tamano"
+                            matInput
+                            [matAutocomplete]="tama"
+                            class="border-0 text-uppercase bg-transparent text-dark" style="width: 100%;height: 100%;outline: none;"
+                            [(ngModel)]="det.tamanoFruta"
+                            id="frutaTamanio_{{det.nro}}"
+                            autocomplete="off" [disabled] = "estadoOrdenVenta > 1"
+                            (keydown.enter)="saltarSiguienteElemento($event)">
+                          <mat-autocomplete #tama="matAutocomplete" [displayWith]="mostrarNombreTamano">
+                            <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let tam of tamanos | async" [value]="tam">
+                              {{tam.nombre}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </td>
+                        <td contenteditable="false" class="bg-secondary" tabindex="-1"  style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <input readonly tabindex="-1"  appNumbersTwoDecimals (blur)="calcularSubTotal(det)"
+                            type="text" class="border-0 text-uppercase bg-transparent"
+                            style="width: 100%;outline: none;text-align:right;" [(ngModel)]="det.cantidadFruta"
+                            id="frutaCantidad_{{det.nro}}"
+                            [disabled] = "estadoOrdenVenta > 1">
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <input readonly type="text" class="border-0 text-uppercase bg-transparent"
+                            style="width: 100%;outline: none;text-align:center;"
+                            *ngIf="det.unidadVenta" [(ngModel)]="det.unidadVenta.nombre"
+                            id="unidadVenta_{{det.nro}}"
+                            [disabled] = "estadoOrdenVenta > 1">
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <input appNumbersTwoDecimals (blur)="calcularSubTotal(det);validarDetalleCabecera($event,det);" type="text"
+                            class="border-0 text-uppercase bg-transparent"
+                            id="precioUnitario_{{det.nro}}"
+                            style="width: 100%;height:100%;outline: none;text-align:right;" [(ngModel)]="det.precioUnitario"
+                            [disabled] = "estadoOrdenVenta > 1"
+                            (keydown.enter)="saltarSiguienteElemento($event)">
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <div class="border-0 text-uppercase bg-transparent pt-1"
+                            style="width: 100%;height: 28px; vertical-align: middle;outline: none;text-align:right;">{{ det.precioTotal | number:'1.2-2' }}</div>
+                          <input type="text" class="border-0 text-uppercase bg-transparent d-none" style="width: 100%;outline: none;"
+                            [(ngModel)]="det.precioTotal" [disabled] = "estadoOrdenVenta > 1">
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <input appNumbersTwoDecimals (blur)="calcularSubTotal(det);validarDetalleCabecera($event,det);" type="text"
+                            class="border-0 text-uppercase bg-transparent"
+                            style="width: 100%;outline: none;text-align:right;" [(ngModel)]="det.descuento"
+                            id="descuento_{{det.nro}}"
+                            [disabled] = "estadoOrdenVenta > 1"
+                            (keydown.enter)="saltarSiguienteElemento($event)">
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <div class="border-0 text-uppercase bg-transparent pt-1"
+                            style="width: 100%;height: 28px; vertical-align: middle;outline: none;text-align:right;">{{ det.precioTotalDescuento | number:'1.2-2' }}</div>
+                          <input type="text" class="border-0 text-uppercase bg-transparent d-none" style="width: 100%;outline: none;"
+                            [(ngModel)]="det.precioTotalDescuento" [disabled] = "estadoOrdenVenta > 1">
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <div class="border-0 text-uppercase bg-transparent pt-1"
+                            style="width: 100%;height: 28px; vertical-align: middle;outline: none;text-align:right;">{{ det.igv | number:'1.2-2' }}</div>
+                          <input type="text" class="border-0 text-uppercase bg-transparent d-none" style="width: 100%;outline: none;"
+                            [(ngModel)]="det.igv" [disabled] = "estadoOrdenVenta > 1">
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;text-align:right;height: 30px;">
+                          <div class="border-0 text-uppercase bg-transparent pt-1"
+                            style="width: 100%;height: 28px; vertical-align: middle;outline: none;">{{ det.precioTotalIgv | number:'1.2-2' }}</div>
+                          <input type="text" class="border-0 text-uppercase bg-transparent d-none" style="width: 100%;outline: none;"
+                            [(ngModel)]="det.precioTotalIgv" [disabled] = "estadoOrdenVenta > 1">
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <input type="text" class="border-0 text-uppercase bg-transparent"
+                            style="width: 100%;outline: none;" [(ngModel)]="det.observacion"
+                            id="observacion_{{det.nro}}"
+                            [disabled] = "estadoOrdenVenta > 1" maxlength="50"
+                            (keydown.enter)="saltarSiguienteElemento($event)">
+                        </td>
+                        <td id="agregarSubDetalle_{{det.nro}}" contenteditable="false" style="vertical-align: middle;height: 30px;" align="center">
+                          <button type="button" class="btn btn-success btn-sm  p-1.5" (click)="agregarEmpaque(det);"
+                          id="btnAgregarSubDetalle_{{det.nro}}"
+                          [disabled] = "estadoOrdenVenta>1 || !det.blnFrutaValida || !det.blnFrutaVariedadValida || !det.blnCategoriaFrutaValida || det.empaques.length > 0">
+                            <span aria-hidden="true">&#43;</span>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <table class="table table-bordered table-hover table-sm w-100 mt-1"
+                     *ngIf="ordenVenta.detalle[i].empaques.length > 0">
+                    <thead class="text-dark" style="background-color: #E2EFDA;">
+                      <tr style="user-select: none;">
+                        <th class="bg-white" style="width:2.5%; border-top-color: white; border-bottom-color: white; border-left-color: white;"></th>
+                        <th class="align-middle text-center" style="width:2%;">Nro</th>
+                        <th class="align-middle text-center" style="width:10%;">Codigo Jaba</th>
+                        <th class="align-middle text-center" style="width:7%;">Vendido - KG</th>
+                        <th class="align-middle text-center" style="width:4%;">Antes</th>
+                        <th class="align-middle text-center" style="width:4%;">Ahora</th>
+                        <th class="align-middle text-center">Observacion</th>
+                        <th class="align-middle text-center" style="width:1%; padding: 0.15rem; vertical-align: middle;"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let emp of ordenVenta.detalle[i].empaques">
+                        <td class="bg-white" style="border-top-color: white; border-bottom-color: white; border-left-color: white;"></td>
+                        <td contenteditable="false" class="text-center text-dark">{{emp.nro}}</td>
+                        <td contenteditable="false" class="bg-secondary">
+                          <!-- <input type="text" class="border-0 text-uppercase bg-transparent" style="width: 100%;outline: none;"
+                            [(ngModel)]="emp.codigoJaba"> -->
+                          <input (keyup)="cambiarValorCodigoJaba($event,det)" type="text"
+                            aria-label="jabas"
+                            matInput
+                            [matAutocomplete]="fru"
+                            class="border-0 text-uppercase bg-transparent text-dark" style="width: 100%;height: 100%;outline: none;"
+                            [(ngModel)]="emp.codigoJaba"
+                            autocomplete="off" (blur)="validarDetalleDetalle($event,emp,det)"
+                            id="codigoJava_{{det.nro}}_{{emp.nro}}"
+                            [disabled] = "estadoOrdenVenta"
+                            (keydown.enter)="saltarSiguienteElemento($event)">
+                          <mat-autocomplete #fru="matAutocomplete" [displayWith]="mostrarNombreCodigoJaba">
+                            <mat-option style="height: 30px;font-size: 0.75rem" *ngFor="let jaba of codigoJaba | async" [value]="jaba">
+                              {{jaba}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </td>
+                        <td contenteditable="false" style="padding: 0.15rem; vertical-align: middle;height: 30px;">
+                          <input appNumbersTwoDecimals type="text" class="border-0 text-uppercase bg-transparent"
+                            style="width: 100%;height: 100%;outline: none;text-align:right;" [(ngModel)]="emp.cantidadVendida"
+                            (blur)="validarDetalleDetalle($event,emp,det);actualizarStock(emp);sumarCantidad(det);"
+                            id="cantidadVendida_{{det.nro}}_{{emp.nro}}"
+                            [disabled] = "estadoOrdenVenta > 1"
+                            (keydown.enter)="saltarSiguienteElemento($event)">
+                        </td>
+                        <td contenteditable="false" class="bg-secondary">
+                          <input appNumbersTwoDecimals type="text" class="border-0 text-uppercase bg-transparent" readonly
+                            style="width: 100%;height: 100%;outline: none;text-align:right;" [(ngModel)]="emp.stockAntes">                          
+                        </td>
+                        <td contenteditable="false" class="bg-secondary">
+                          <input appNumbersTwoDecimals type="text" class="border-0 text-uppercase bg-transparent" readonly
+                            style="width: 100%;height: 100%;outline: none;text-align:right;"  [(ngModel)]="emp.stockAhora">                           
+                        </td>
+                        <td contenteditable="false">
+                          <input type="text" class="border-0 text-uppercase bg-transparent" style="width: 100%;outline: none;"
+                            [(ngModel)]="emp.observacion"
+                            id="observacion_{{det.nro}}_{{emp.nro}}"
+                            [disabled] = "estadoOrdenVenta > 1" maxlength="100"
+                            (keydown.enter)="saltarSiguienteElemento($event)">
+                        </td>
+                        <td contenteditable="false" style="vertical-align: middle;" align="center">
+                          <button type="button" class="btn btn-danger btn-sm p-1.5" (click)="quitarEmpaque(emp, ordenVenta.detalle[i])"
+                          [disabled] = "estadoOrdenVenta > 1">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="" style="position:fixed;bottom:0;width: 100%; height:10%;">
+      <div class="form-group row my-0">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-8">
+          <div class="form-group row mb-0">
+            <label class="col-sm-1 col-form-label" for="formaPagoForm">Forma&nbsp;Pago</label>
+            <div class="col-sm-2">
+              <select [compareWith]="compararAux"
+                  class="form-control bg-secondary pt-1"
+                  [(ngModel)]="ordenVenta.formaPagoVenta" style="height: 28px;">
+                <option *ngFor="let fpg of formasPago" [ngValue]="fpg">{{ fpg.nombre }}</option>
+              </select>
+            </div>
+            <div class="col-sm" style="padding-left: 65px;">
+              <table class="table table-bordered table-hover table-sm w-100">
+                <thead class="bg-tevo-green text-dark">
+                  <tr style="user-select: none;">
+                    <th class="align-middle text-center" style="width:17%;">P.Total</th>
+                    <th class="align-middle text-center" style="width:17%;">Dcto</th>
+                    <th class="align-middle text-center" style="width:17%;">P.Dcto</th>
+                    <th class="align-middle text-center" style="width:17%;">Igv</th>
+                    <th class="align-middle text-center" style="width:17%;">P.Final</th>
+                    <th class="bg-white" style="border-top-color: white; border-bottom-color: white; border-right-color: white;"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td contenteditable="false">
+                      <div class="border-0 text-uppercase bg-transparent pt-1"
+                        style="width: 100%;height: 25px; vertical-align: middle;outline: none; text-align: right;">{{ ordenVenta.total | number:'1.2-2' }}</div>
+                      <input type="text" class="border-0 text-uppercase bg-transparent d-none" style="width: 100%;outline: none;"
+                        [(ngModel)]="ordenVenta.total" [disabled] = "estadoOrdenVenta > 1">
+                    </td>
+                    <td contenteditable="false">
+                      <div class="border-0 text-uppercase bg-transparent pt-1"
+                        style="width: 100%;height: 25px; vertical-align: middle;outline: none; text-align: right;">{{ ordenVenta.totalDescuento | number:'1.2-2' }}</div>
+                      <input readonly appNumbersTwoDecimals type="text" class="border-0 text-uppercase bg-transparent d-none" style="width: 100%;outline: none;"
+                        [(ngModel)]="ordenVenta.totalDescuento" [disabled] = "estadoOrdenVenta > 1">
+                    </td>
+                    <td contenteditable="false">
+                      <div class="border-0 text-uppercase bg-transparent pt-1"
+                        style="width: 100%;height: 25px; vertical-align: middle;outline: none; text-align: right;">{{ ordenVenta.totalMasDescuento | number:'1.2-2' }}</div>
+                      <input type="text" class="border-0 text-uppercase bg-transparent d-none" style="width: 100%;outline: none;"
+                        [(ngModel)]="ordenVenta.totalMasDescuento" [disabled] = "estadoOrdenVenta > 1">
+                    </td>
+                    <td contenteditable="false">
+                      <div class="border-0 text-uppercase bg-transparent pt-1"
+                        style="width: 100%;height: 25px; vertical-align: middle;outline: none; text-align: right;">{{ ordenVenta.totalIgv | number:'1.2-2' }}</div>
+                      <input type="text" class="border-0 text-uppercase bg-transparent d-none" style="width: 100%;outline: none;"
+                        [(ngModel)]="ordenVenta.totalIgv" [disabled] = "estadoOrdenVenta > 1">
+                    </td>
+                    <td contenteditable="false">
+                      <div class="border-0 text-uppercase bg-transparent pt-1"
+                        style="width: 100%;height: 25px; vertical-align: middle;outline: none; text-align: right;">{{ ordenVenta.totalMasIgv | number:'1.2-2' }}</div>
+                      <input type="text" class="border-0 text-uppercase bg-transparent d-none" style="width: 100%;outline: none;"
+                        [(ngModel)]="ordenVenta.totalMasIgv" [disabled] = "estadoOrdenVenta > 1">
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-sm-3"></div>
+          </div>
+        </div>
+        <div class="col-sm-2"></div>
+      <div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+/* .mat-option.mat-active {
+  background: red !important;
+} */
+/* .modal-lg {
+  max-width: 70% !important;
+} */
+/*
+.cdk-overlay-container,.cdk-global-overlay-wrapper,.cdk-overlay-connected-position-bounding-box {
+  z-index: 9000
+} */
+
+/* input[type=date]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    display: none;
+}
+
+
+
+input[type=date]::-webkit-calendar-picker-indicator {
+    -webkit-appearance: none;
+    display: none;
+} */
+/* color del listado */
+.mat-option{
+  background: black !important;
+}
+/* color de la seleccion */
+.mat-option.mat-active {
+  background: blue !important;
+}
+
+.place-rojo::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: red;
+  opacity: 0.8; /* Firefox */
+}
+
+.place-rojo::-ms-input-placeholder { /* Microsoft Edge */
+  color: red;
+}
+
+input[type="text"]:disabled {
+  color: black;
+}
+
+.contenedor-detalle {
+  border-color: white;
+  border-right-width: thin;
+  border-left-width: thin;
+  border-style: solid;
+}
+
+.focusRed {
+    outline: 1px solid red;
+    border:1px solid red;
+    box-shadow: 0 0 5px red;
+    background-color:#fff0f0
+}
+
+.focusInput::-webkit-input-placeholder {
+    color: red
+ }
+
+.parpadea {
+  animation-name: parpadeo;
+  animation-duration: 2s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+
+  -webkit-animation-name:parpadeo;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-timing-function: linear;
+  -webkit-animation-iteration-count: infinite;
+}
+
+@-moz-keyframes parpadeo{
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
+}
+
+@-webkit-keyframes parpadeo {
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
+}
+
+@keyframes parpadeo {
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
+}
